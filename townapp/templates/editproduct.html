@@ -1,0 +1,289 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block main %}
+<style>
+    /* =========================================
+       ULTRA-PREMIUM EDIT PRODUCT (SAND & BLUSH V3)
+       ========================================= */
+    :root {
+        --tk-glass: rgba(255, 255, 255, 0.75);
+        --tk-glass-border: rgba(255, 255, 255, 0.9);
+        --tk-shadow: 0 35px 60px rgba(196, 164, 145, 0.18);
+        --tk-sand: #e2d1c3;
+        --tk-dark: #1a1a1a;
+    }
+
+    body {
+        background: radial-gradient(circle at top left, #fdfcfb 0%, #f4eae4 100%);
+        overflow-x: hidden;
+        font-family: 'Jost', sans-serif;
+    }
+
+    /* Ambient Blobs for Background */
+    .ambient-blob { position: absolute; filter: blur(85px); z-index: -1; opacity: 0.65; border-radius: 50%; animation: floatBlob 12s infinite alternate ease-in-out; }
+    .blob-1 { top: 2%; left: -5%; width: 450px; height: 450px; background: #e2d1c3; }
+    .blob-2 { bottom: -10%; right: -5%; width: 550px; height: 550px; background: #fdfcfb; }
+
+    @keyframes floatBlob {
+        0% { transform: translate(0, 0) scale(1); }
+        100% { transform: translate(40px, -60px) scale(1.05); }
+    }
+
+    /* Glass Card */
+    .tk-glass-card {
+        background: var(--tk-glass);
+        backdrop-filter: blur(25px);
+        -webkit-backdrop-filter: blur(25px);
+        border: 1px solid var(--tk-glass-border);
+        border-radius: 24px;
+        box-shadow: var(--tk-shadow);
+        padding: 45px;
+        margin-top: 30px;
+        margin-bottom: 50px;
+        transition: 0.3s;
+    }
+
+    .tk-label { font-weight: 600; margin-bottom: 10px; color: #333; display: block; text-align: left; font-size: 15px; }
+    .tk-label i { color: var(--tk-dark); opacity: 0.7; }
+
+    .tk-input, .tk-select {
+        width: 100%; padding: 14px 20px; border-radius: 12px;
+        border: 1px solid rgba(0,0,0,0.08); background: rgba(255,255,255,0.85);
+        margin-bottom: 25px; transition: 0.3s; font-family: 'Jost', sans-serif;
+        font-size: 15px;
+    }
+    .tk-input:focus, .tk-select:focus {
+        border-color: var(--tk-dark); outline: none;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.05); background: #fff;
+    }
+
+    .tk-title { font-family: 'Playfair Display', serif; font-size: 36px; font-weight: bold; color: var(--tk-dark); margin-bottom: 35px; text-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+
+    .btn-primary-dark {
+        background: var(--tk-dark); color: #fff; padding: 16px 35px;
+        border-radius: 12px; border: none; font-weight: 600; font-size: 16px;
+        width: 100%; transition: all 0.3s ease; font-family: 'Jost', sans-serif; cursor: pointer;
+        box-shadow: 0 10px 20px rgba(26,26,26,0.2);
+    }
+    .btn-primary-dark:hover { background: #e7ab3c; color: var(--tk-dark); transform: translateY(-3px); box-shadow: 0 15px 25px rgba(231, 171, 60, 0.3); }
+
+    /* Image Preview Section */
+    .img-upload-box {
+        background: #fff; border: 2px dashed rgba(0,0,0,0.1); border-radius: 20px;
+        padding: 20px; text-align: center; transition: 0.3s;
+    }
+    .img-upload-box:hover { border-color: var(--tk-dark); }
+    #preview-img { width: 100%; max-height: 320px; object-fit: cover; border-radius: 15px; box-shadow: 0 8px 20px rgba(0,0,0,0.08); cursor: zoom-in; transition: 0.4s; }
+    #preview-img:hover { transform: scale(1.03); }
+
+    /* Full Screen Overlay */
+    #image-overlay {
+        display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+        background: rgba(0,0,0,0.9); z-index: 9999; justify-content: center; align-items: center; cursor: zoom-out;
+    }
+    #full-image-preview { max-width: 90%; max-height: 90%; border-radius: 12px; box-shadow: 0 10px 40px rgba(0,0,0,0.6); object-fit: contain; }
+    .close-overlay { position: absolute; top: 25px; right: 40px; color: #fff; font-size: 45px; font-weight: bold; cursor: pointer; transition: 0.3s; }
+    .close-overlay:hover { color: #e7ab3c; transform: scale(1.1); }
+
+    /* Extra Images Section */
+    .extra-images-wrapper { background: rgba(255,255,255,0.5); padding: 25px; border-radius: 16px; border: 1px solid rgba(0,0,0,0.05); }
+    .extra-img-row { display: flex; align-items: center; gap: 15px; margin-bottom: 15px; }
+</style>
+
+<div class="ambient-blob blob-1"></div>
+<div class="ambient-blob blob-2"></div>
+
+<div id="image-overlay">
+    <span class="close-overlay">&times;</span>
+    <img src="" id="full-image-preview">
+</div>
+
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-11">
+            <div class="tk-glass-card">
+                <h2 class="tk-title text-center"><i class="fa fa-magic me-2" style="color: #e7ab3c;"></i> Edit Product Studio</h2>
+
+                <form action="" method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <div class="row mt-5">
+
+                        <div class="col-md-4 text-center mb-4">
+                            <div class="img-upload-box">
+                                <label class="tk-label text-center w-100 mb-3"><i class="fa fa-camera"></i> Main Image</label>
+
+                                <img src="{% if product.image %}{{ product.image.url }}{% else %}{% static 'img/default-product.png' %}{% endif %}" id="preview-img" alt="Preview Image">
+
+                                <div id="preview-badge" style="margin-top: -15px; position: relative; z-index: 10; padding: 6px 20px; border-radius: 30px; color: white; display: inline-block; background: #2e7d32; font-size: 13px; font-weight: 600; letter-spacing: 1px; box-shadow: 0 4px 15px rgba(0,0,0,0.2);">IN STOCK</div>
+
+                                <input type="file" name="image" id="live-image" class="form-control mt-4" style="font-size: 14px; border-radius: 10px; padding: 12px; background: #f8f9fa;">
+                            </div>
+                        </div>
+
+                        <div class="col-md-8">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <label class="tk-label"><i class="fa fa-cube me-2"></i> Product Name <span>*</span></label>
+                                    <input type="text" name="name" class="tk-input" value="{{ product.name }}" placeholder="e.g. Premium Silk Saree" required>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label class="tk-label"><i class="fa fa-tag me-2"></i> Price (₹) <span>*</span></label>
+                                    <input type="number" name="price" id="live-price" class="tk-input" value="{{ product.price }}" placeholder="0.00" required>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label class="tk-label"><i class="fa fa-list-alt me-2"></i> Category <span>*</span></label>
+                                    <select name="category" class="tk-select" required>
+<!--                                        <option value="" disabled>Select Category</option>-->
+                                        {% for c in categories %}
+                                            <option value="{{ c.id }}" {% if product.category and product.category.id == c.id %}selected{% endif %}>
+                                                {{ c.name }}
+                                            </option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label class="tk-label"><i class="fa fa-layer-group me-2"></i> Stock Quantity <span>*</span></label>
+                                    <input type="number" name="qty" id="live-qty" class="tk-input" value="{{ product.qty }}" placeholder="Enter available quantity" required>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label class="tk-label"><i class="fa fa-toggle-on me-2"></i> Status</label>
+                                    <select name="status" id="live-status" class="tk-select">
+                                        <option value="Active" {% if product.status == 'Active' %}selected{% endif %}>🟢 Active (Visible to buyers)</option>
+                                        <option value="Inactive" {% if product.status == 'Inactive' %}selected{% endif %}>🔴 Inactive (Hidden)</option>
+                                    </select>
+                                </div>
+
+                                <div class="col-md-12">
+                                    <label class="tk-label"><i class="fa fa-align-left me-2"></i> Description <span>*</span></label>
+                                    <textarea name="desc" class="tk-input" rows="4" placeholder="Write a catchy description for your product..." required>{% if product.description %}{{ product.description }}{% else %}{{ product.desc }}{% endif %}</textarea>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row mt-3">
+                        <div class="col-12">
+                            <div class="extra-images-wrapper">
+                                <h5 style="font-family: 'Playfair Display'; font-weight: bold; color: var(--tk-dark); margin-bottom: 20px;">
+                                    <i class="fa fa-images me-2 text-muted"></i> Extra Product Images (Gallery)
+                                </h5>
+
+                                <div id="extra-img-container">
+                                    <div class="extra-img-row">
+                                        <input type="file" name="extra_images[]" class="tk-input mb-0 w-100" accept="image/*">
+                                        <button type="button" class="btn btn-danger remove-img-btn" style="border-radius: 10px; padding: 14px 20px; display: none;"><i class="fa fa-trash"></i></button>
+                                    </div>
+                                </div>
+
+                                <button type="button" id="add-more-img-btn" class="btn btn-outline-dark mt-3" style="border-radius: 10px; font-weight: 600;">
+                                    <i class="fa fa-plus-circle me-1"></i> Add Another Image
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row mt-5">
+                        <div class="col-12 text-center">
+                            <button type="submit" class="btn-primary-dark" style="max-width: 350px;">
+                                <i class="fa fa-cloud-upload-alt me-2"></i> Update Product Catalog
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+
+        // --- 1. Live Stock Badge Updater ---
+        function updateBadge() {
+            const qty = parseInt(document.getElementById('live-qty').value) || 0;
+            const status = document.getElementById('live-status').value;
+            const badge = document.getElementById('preview-badge');
+
+            if (badge) {
+                if (qty <= 0 || status === 'Inactive' || status === 'unavailable') {
+                    badge.innerHTML = '<i class="fa fa-times-circle"></i> OUT OF STOCK';
+                    badge.style.background = '#d9534f';
+                    badge.style.boxShadow = '0 4px 15px rgba(217, 83, 79, 0.3)';
+                } else {
+                    badge.innerHTML = '<i class="fa fa-check-circle"></i> IN STOCK';
+                    badge.style.background = '#2e7d32';
+                    badge.style.boxShadow = '0 4px 15px rgba(46, 125, 50, 0.3)';
+                }
+            }
+        }
+
+        const liveQty = document.getElementById('live-qty');
+        const liveStatus = document.getElementById('live-status');
+        if (liveQty) liveQty.addEventListener('input', updateBadge);
+        if (liveStatus) liveStatus.addEventListener('change', updateBadge);
+        updateBadge();
+
+        // --- 2. Live Main Image Preview ---
+        const liveImage = document.getElementById('live-image');
+        const previewImg = document.getElementById('preview-img');
+
+        if (liveImage && previewImg) {
+            liveImage.addEventListener('change', function(event) {
+                const file = event.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) { previewImg.src = e.target.result; }
+                    reader.readAsDataURL(file);
+                }
+            });
+        }
+
+        // --- 3. Full Screen Image Overlay Logic ---
+        const overlay = document.getElementById('image-overlay');
+        const fullImg = document.getElementById('full-image-preview');
+        const closeBtn = document.querySelector('.close-overlay');
+
+        if (previewImg && overlay && fullImg) {
+            previewImg.addEventListener('click', function() {
+                if(this.src && !this.src.endsWith(window.location.pathname)) {
+                    fullImg.src = this.src;
+                    overlay.style.display = 'flex';
+                }
+            });
+        }
+
+        if (overlay) {
+            overlay.addEventListener('click', function(e) {
+                if (e.target === overlay || e.target === closeBtn) {
+                    this.style.display = 'none';
+                }
+            });
+        }
+
+        // --- 4. Extra Images Add/Remove Logic ---
+        const addImgBtn = document.getElementById('add-more-img-btn');
+        const imgContainer = document.getElementById('extra-img-container');
+
+        addImgBtn.addEventListener('click', function() {
+            // Create new row
+            const newRow = document.createElement('div');
+            newRow.className = 'extra-img-row';
+            newRow.innerHTML = `
+                <input type="file" name="extra_images[]" class="tk-input mb-0 w-100" accept="image/*">
+                <button type="button" class="btn btn-danger remove-img-btn" style="border-radius: 10px; padding: 14px 20px;"><i class="fa fa-trash"></i></button>
+            `;
+            imgContainer.appendChild(newRow);
+
+            // Add remove logic to the new button
+            newRow.querySelector('.remove-img-btn').addEventListener('click', function() {
+                newRow.remove();
+            });
+        });
+    });
+</script>
+{% endblock %}

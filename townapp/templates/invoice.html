@@ -1,0 +1,354 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block main %}
+<style>
+    /* =========================================
+       PROFESSIONAL TAX INVOICE STYLES
+       ========================================= */
+    .invoice-container {
+        background-color: #f4f6f9;
+        padding: 50px 15px 100px;
+        font-family: 'Jost', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+        min-height: 80vh;
+    }
+
+    .tax-invoice {
+        max-width: 900px;
+        margin: 0 auto;
+        background: #fff;
+        padding: 50px 60px;
+        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.08);
+        border-top: 6px solid var(--text-dark, #1a1a1a);
+        border-radius: 8px;
+    }
+
+    .invoice-header {
+        display: flex;
+        justify-content: space-between;
+        border-bottom: 2px solid #f0f0f0;
+        padding-bottom: 25px;
+        margin-bottom: 35px;
+    }
+
+    .company-details h2 {
+        font-size: 32px;
+        font-weight: 800;
+        color: #1a1a1a;
+        margin-bottom: 5px;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        font-family: 'Playfair Display', serif;
+    }
+
+    .company-details p {
+        margin: 3px 0;
+        color: #555;
+        font-size: 14px;
+    }
+
+    .invoice-details {
+        text-align: right;
+    }
+
+    .invoice-details h1 {
+        font-size: 26px;
+        color: #1a1a1a;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        margin-bottom: 15px;
+        font-weight: 700;
+    }
+
+    .invoice-details p {
+        margin: 4px 0;
+        font-size: 14px;
+        color: #555;
+    }
+
+    .billing-section {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 40px;
+        background: #fcfcfc;
+        padding: 20px;
+        border-radius: 8px;
+        border: 1px solid #f0f0f0;
+    }
+
+    .billing-box {
+        width: 48%;
+    }
+
+    .billing-box h5 {
+        font-size: 13px;
+        font-weight: 700;
+        text-transform: uppercase;
+        color: #888;
+        border-bottom: 2px solid #e1e1e1;
+        padding-bottom: 8px;
+        margin-bottom: 12px;
+        letter-spacing: 1px;
+    }
+
+    .billing-box p {
+        margin: 4px 0;
+        font-size: 15px;
+        color: #333;
+        line-height: 1.5;
+    }
+
+    .billing-box strong {
+        color: #1a1a1a;
+        font-size: 16px;
+    }
+
+    .invoice-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-bottom: 40px;
+    }
+
+    .invoice-table th {
+        background-color: #1a1a1a;
+        color: #ffffff;
+        font-size: 13px;
+        text-transform: uppercase;
+        padding: 15px 12px;
+        text-align: left;
+        letter-spacing: 1px;
+    }
+
+    .invoice-table td {
+        padding: 15px 12px;
+        font-size: 15px;
+        color: #333;
+        border-bottom: 1px solid #f0f0f0;
+        vertical-align: middle;
+    }
+
+    .text-right { text-align: right !important; }
+    .text-center { text-align: center !important; }
+
+    .totals-section {
+        display: flex;
+        justify-content: flex-end;
+        margin-bottom: 40px;
+    }
+
+    .totals-table {
+        width: 400px;
+        border-collapse: collapse;
+    }
+
+    .totals-table td {
+        padding: 12px 15px;
+        font-size: 15px;
+        color: #555;
+        border-bottom: 1px solid #f0f0f0;
+    }
+
+    .totals-table .grand-total {
+        font-size: 20px;
+        font-weight: 800;
+        color: #1a1a1a;
+        background-color: #fcfcfc;
+        border-bottom: none;
+        border-top: 2px solid #1a1a1a;
+    }
+
+    .footer-note {
+        text-align: center;
+        font-size: 13px;
+        color: #888;
+        border-top: 1px solid #f0f0f0;
+        padding-top: 25px;
+        line-height: 1.6;
+    }
+
+    .action-buttons {
+        text-align: center;
+        margin: 40px 0;
+    }
+
+    .btn-print {
+        background-color: #1a1a1a;
+        color: #fff;
+        padding: 15px 40px;
+        border: none;
+        border-radius: 50px;
+        font-size: 14px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        cursor: pointer;
+        transition: 0.3s;
+        box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+    }
+
+    .btn-print:hover {
+        background-color: #c4a491;
+        transform: translateY(-2px);
+    }
+
+    /* Print Specific Styles */
+    @media print {
+        body * { visibility: hidden; }
+        .tax-invoice, .tax-invoice * { visibility: visible; }
+        .tax-invoice {
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 100%;
+            box-shadow: none;
+            border: none;
+            padding: 20px;
+        }
+        .action-buttons, .breadcrum-section, header, footer { display: none !important; }
+        body { background-color: #fff; }
+    }
+</style>
+
+<div class="invoice-container">
+    <div class="action-buttons mb-4 text-left container">
+        <a href="/orderhistory" style="color: #555; text-decoration: none; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; font-size: 13px;">
+            <i class="fa fa-arrow-left me-2"></i> Back to Orders
+        </a>
+    </div>
+
+    <div class="tax-invoice" id="printableArea">
+        <div class="invoice-header">
+            <div class="company-details">
+                <h2>TownKart<span>.</span></h2>
+                <p>101, Premium Business Hub, Ashram Road</p>
+                <p>Ahmedabad, Gujarat 380009, India</p>
+                <p><strong>GSTIN:</strong> 24ABCDE1234F1Z5</p>
+                <p><strong>Email:</strong> support@townkart.in</p>
+            </div>
+            <div class="invoice-details">
+                <h1>Tax Invoice</h1>
+                <p><strong>Invoice No:</strong> INV-2026-{{ order.id|stringformat:"04d" }}</p>
+                <p><strong>Order ID:</strong> ORD-{{ order.id }}</p>
+                <p><strong>Order Date:</strong> {{ order.order_date|date:"d-M-Y" }}</p>
+               <p><strong>Payment Status:</strong>
+    {% if order.payment_set.first.method == 'Cash on Delivery' %}
+        <span style="color: #d9534f; font-weight: 800; text-transform: uppercase;">Pending (COD)</span>
+    {% else %}
+        <span style="color: #2e7d32; font-weight: 800; text-transform: uppercase;">Paid</span>
+    {% endif %}
+</p>
+            </div>
+        </div>
+
+        <div class="billing-section">
+            <div class="billing-box">
+                <h5>Billed To:</h5>
+                <p><strong>{{ order.user.name }}</strong></p>
+                <p>{{ order.user.address }}</p>
+                <p>{{ order.user.city|default:"City" }}, {{ order.user.state|default:"Gujarat" }} - {{ order.user.pincode|default:"000000" }}</p>
+                <p><strong>Phone:</strong> +91 {{ order.user.contact_no }}</p>
+                <p><strong>Email:</strong> {{ order.user.email }}</p>
+            </div>
+            <div class="billing-box">
+                <h5>Shipped To:</h5>
+                <p><strong>{{ order.user.name }}</strong></p>
+                <p>{{ order.user.address }}</p>
+                <p>{{ order.user.city|default:"City" }}, {{ order.user.state|default:"Gujarat" }} - {{ order.user.pincode|default:"000000" }}</p>
+                <p><strong>Payment Method:</strong> {% if order.payment_set.first %}{{ order.payment_set.first.method }}{% else %}Online Payment{% endif %}</p>
+            </div>
+        </div>
+
+        <table class="invoice-table">
+            <thead>
+                <tr>
+                    <th class="text-center">#</th>
+                    <th>Item Description</th>
+                    <th class="text-center">HSN/SAC</th>
+                    <th class="text-center">Qty</th>
+                    <th class="text-right">Unit Price (₹)</th>
+                    <th class="text-right">Total (₹)</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in order_items %}
+                <tr>
+                    <td class="text-center">{{ forloop.counter }}</td>
+                    <td>
+                        <strong>{% if item.sub_product %}{{ item.sub_product.name }}{% else %}{{ item.product.name }}{% endif %}</strong><br>
+                        <span style="font-size: 13px; color: #888;">
+                            Category: {% if item.sub_product %}{{ item.sub_product.category.name }}{% else %}{{ item.product.category.name }}{% endif %}
+                            {% if item.selected_size %} | Size: {{ item.selected_size }}{% endif %}
+                        </span>
+                    </td>
+                    <td class="text-center">6109</td> <td class="text-center">{{ item.quantity }}</td>
+                    <td class="text-right">{% if item.sub_product %}{{ item.sub_product.price|floatformat:2 }}{% else %}{{ item.product.price|floatformat:2 }}{% endif %}</td>
+                    <td class="text-right" style="font-weight: 600;">{{ item.total_amount|floatformat:2 }}</td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="6" class="text-center">No items found for this order.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <div class="totals-section">
+            <table class="totals-table">
+                <tr>
+                    <td>Taxable Amount (Base Value)</td>
+                    <td class="text-right" id="calc-base" data-amount="{{ order.total_amount }}">₹ {{ order.total_amount|floatformat:2 }}</td>
+                </tr>
+                <tr>
+                    <td>CGST (9%)</td>
+                    <td class="text-right" id="calc-cgst">₹ 0.00</td>
+                </tr>
+                <tr>
+                    <td>SGST (9%)</td>
+                    <td class="text-right" id="calc-sgst">₹ 0.00</td>
+                </tr>
+                <tr>
+                    <td>Shipping Charges</td>
+                    <td class="text-right">₹ 0.00</td>
+                </tr>
+                <tr class="grand-total">
+                    <td>Grand Total (Incl. Taxes)</td>
+                    <td class="text-right" id="calc-grand">₹ 0.00</td>
+                </tr>
+            </table>
+        </div>
+
+        <div style="margin-bottom: 40px; margin-top: 20px;">
+            <h5 style="font-size: 13px; color: #333; text-transform: uppercase; border-bottom: 2px solid #f0f0f0; padding-bottom: 8px; font-weight: 700;">Declaration</h5>
+            <p style="font-size: 13px; color: #777; margin-top: 10px; line-height: 1.6;">We declare that this invoice shows the actual price of the goods described and that all particulars are true and correct. The goods sold are intended for end-user consumption and not for commercial resale.</p>
+        </div>
+
+        <div class="footer-note">
+            <p><strong style="color: #333;">This is a computer-generated tax invoice and does not require a physical signature.</strong></p>
+            <p style="margin-top: 5px;">Thank you for shopping with TownKart! Visit again.</p>
+        </div>
+    </div>
+
+    <div class="action-buttons">
+        <button onclick="window.print()" class="btn-print"><i class="fa fa-print me-2"></i> Print Tax Invoice</button>
+    </div>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        // 1. Base રકમ લો
+        var baseElement = document.getElementById("calc-base");
+        var baseAmount = parseFloat(baseElement.getAttribute("data-amount")) || 0;
+
+        // 2. એકદમ સચોટ (Perfect) ગણતરી કરો
+        var cgst = baseAmount * 0.09;
+        var sgst = baseAmount * 0.09;
+        var grandTotal = baseAmount + cgst + sgst;
+
+        // 3. HTML માં બે પોઇન્ટ (Decimal) સાથે બતાવો
+        document.getElementById("calc-cgst").innerText = "₹ " + cgst.toFixed(2);
+        document.getElementById("calc-sgst").innerText = "₹ " + sgst.toFixed(2);
+        document.getElementById("calc-grand").innerText = "₹ " + grandTotal.toFixed(2);
+    });
+</script>
+
+{% endblock %}

@@ -1,0 +1,359 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block main %}
+
+<style>
+    /* =========================================
+       TOWNKART PREMIUM EDITORIAL FEEDBACK (3D UI)
+       ========================================= */
+    :root {
+        --bg-blush: #fdfbfb;
+        --bg-sand: #dcbfae;
+        --bg-sand-dark: #c4a491;
+        --text-dark: #1a1a1a;
+        --text-muted: #888888;
+        --gold: #e7ab3c;
+        --3d-shadow: 0 20px 40px rgba(0, 0, 0, 0.08);
+        --3d-shadow-hover: 0 30px 50px rgba(220, 191, 174, 0.4);
+    }
+
+    body {
+        background-color: var(--bg-blush);
+        font-family: 'Jost', sans-serif;
+        overflow-x: hidden;
+    }
+
+    /* --- Animations --- */
+    @keyframes fadeUp {
+        0% { opacity: 0; transform: translateY(40px); }
+        100% { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes floatBlob {
+        0% { transform: translate(0, 0) scale(1); }
+        33% { transform: translate(30px, -50px) scale(1.1); }
+        66% { transform: translate(-20px, 20px) scale(0.9); }
+        100% { transform: translate(0, 0) scale(1); }
+    }
+    .animate-up { opacity: 0; animation: fadeUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+    .delay-1 { animation-delay: 0.1s; }
+    .delay-2 { animation-delay: 0.2s; }
+    .delay-3 { animation-delay: 0.3s; }
+
+    /* --- Hero & Background --- */
+    .feedback-hero {
+        position: relative;
+        padding: 80px 0 60px;
+        text-align: center;
+        overflow: hidden;
+    }
+    .blob-1, .blob-2 {
+        position: absolute;
+        filter: blur(80px);
+        border-radius: 50%;
+        z-index: 0;
+        opacity: 0.6;
+        animation: floatBlob 10s infinite ease-in-out;
+    }
+    .blob-1 { width: 400px; height: 400px; background: var(--bg-sand); top: -10%; left: 10%; }
+    .blob-2 { width: 350px; height: 350px; background: #e0d4cc; bottom: -20%; right: 10%; animation-delay: -5s; }
+
+    .page-title {
+        position: relative;
+        z-index: 2;
+        font-family: 'Playfair Display', serif;
+        font-size: 4rem;
+        font-weight: 700;
+        color: var(--text-dark);
+        letter-spacing: -1px;
+        margin-bottom: 10px;
+    }
+    .page-subtitle {
+        color: var(--text-muted);
+        font-size: 18px;
+        position: relative;
+        z-index: 2;
+    }
+
+    .breadcrumb-3d {
+        background: rgba(255, 255, 255, 0.6);
+        backdrop-filter: blur(15px);
+        border-radius: 50px;
+        padding: 12px 30px;
+        box-shadow: 0 10px 20px rgba(0,0,0,0.03), inset 0 0 0 1px rgba(255,255,255,0.8);
+        display: inline-block;
+        font-weight: 500;
+        font-size: 14px;
+        position: relative;
+        z-index: 2;
+        margin-top: 20px;
+    }
+    .breadcrumb-3d a { color: var(--text-dark); margin-right: 10px; transition: 0.3s; text-decoration: none;}
+    .breadcrumb-3d a:hover { color: var(--bg-sand-dark); }
+    .breadcrumb-3d span { color: var(--text-muted); }
+
+    /* --- Review Cards (3D Style) --- */
+    .review-card-3d {
+        background: #ffffff;
+        border-radius: 30px;
+        padding: 40px;
+        box-shadow: 0 15px 35px rgba(0,0,0,0.03);
+        margin-bottom: 30px;
+        transition: all 0.4s ease;
+        border: 1px solid rgba(255,255,255,0.9);
+        position: relative;
+        z-index: 2;
+    }
+    .review-card-3d:hover {
+        transform: translateY(-10px);
+        box-shadow: var(--3d-shadow-hover);
+    }
+    .reviewer-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+    }
+    .reviewer-name {
+        font-family: 'Playfair Display', serif;
+        font-size: 22px;
+        font-weight: 700;
+        color: var(--text-dark);
+        margin: 0;
+    }
+    .verified-badge {
+        background: rgba(220, 191, 174, 0.15);
+        color: var(--bg-sand-dark);
+        padding: 6px 15px;
+        border-radius: 50px;
+        font-size: 12px;
+        font-weight: 600;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+    }
+    .rating-display {
+        color: var(--gold);
+        font-size: 16px;
+        margin-bottom: 15px;
+    }
+    .rating-display span {
+        color: var(--text-dark);
+        font-weight: 700;
+        margin-right: 5px;
+    }
+    .review-text {
+        font-size: 16px;
+        color: #555;
+        line-height: 1.8;
+        font-style: italic;
+        margin: 0;
+    }
+
+    /* --- Form Glass Card --- */
+    .form-glass-card {
+        background: rgba(255, 255, 255, 0.6);
+        backdrop-filter: blur(30px);
+        border-radius: 40px;
+        padding: 50px;
+        box-shadow: var(--3d-shadow), inset 0 0 0 1px rgba(255,255,255,0.8);
+        position: sticky;
+        top: 100px;
+        z-index: 5;
+    }
+    .form-title {
+        font-family: 'Playfair Display', serif;
+        font-size: 28px;
+        font-weight: 700;
+        color: var(--text-dark);
+        margin-bottom: 30px;
+    }
+
+    /* Minimal Input Fields */
+    .form-group label {
+        font-size: 12px;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        color: var(--text-muted);
+        font-weight: 600;
+        margin-bottom: 10px;
+        display: block;
+    }
+    .glass-input {
+        width: 100%;
+        background: #ffffff;
+        border: none;
+        border-radius: 20px;
+        padding: 15px 25px;
+        font-family: 'Jost', sans-serif;
+        font-size: 15px;
+        color: var(--text-dark);
+        box-shadow: inset 0 3px 10px rgba(0,0,0,0.03);
+        transition: all 0.3s ease;
+    }
+    .glass-input:focus {
+        outline: none;
+        box-shadow: inset 0 3px 10px rgba(0,0,0,0.05), 0 0 0 3px rgba(220, 191, 174, 0.3);
+    }
+
+    /* 3D Interactive Star Rating */
+    .glowing-stars {
+        display: flex;
+        flex-direction: row-reverse;
+        justify-content: flex-end;
+        background: #ffffff;
+        padding: 15px 25px;
+        border-radius: 20px;
+        box-shadow: inset 0 3px 10px rgba(0,0,0,0.03);
+    }
+    .glowing-stars input { display: none; }
+    .glowing-stars label {
+        font-size: 30px;
+        color: #e0e0e0;
+        cursor: pointer;
+        padding-right: 10px;
+        transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+    .glowing-stars input:checked ~ label,
+    .glowing-stars label:hover,
+    .glowing-stars label:hover ~ label {
+        color: var(--gold);
+        transform: scale(1.15);
+    }
+
+    /* Super Dark Button */
+    .btn-super-dark {
+        width: 100%;
+        background: linear-gradient(45deg, #1a1a1a, #333333);
+        color: #fff !important;
+        padding: 18px 30px;
+        border-radius: 50px;
+        font-size: 13px; font-weight: 600; letter-spacing: 2px; text-transform: uppercase;
+        border: none; cursor: pointer; text-decoration: none;
+        box-shadow: 0 15px 30px rgba(0,0,0,0.15), inset 0 2px 0 rgba(255,255,255,0.2);
+        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        margin-top: 20px;
+    }
+    .btn-super-dark:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 25px 45px rgba(0,0,0,0.25);
+    }
+
+    @media (max-width: 991px) {
+        .page-title { font-size: 3rem; }
+        .form-glass-card { position: relative; top: 0; margin-top: 40px; }
+    }
+</style>
+
+<section class="feedback-hero">
+    <div class="blob-1"></div>
+    <div class="blob-2"></div>
+    <div class="container relative z-index-2 animate-up">
+        <h1 class="page-title">TownKart Experiences</h1>
+        <p class="page-subtitle">Discover real stories from our community.</p>
+        <div class="breadcrumb-3d">
+            <a href="/"><i class="fa fa-home"></i> Home</a> &rsaquo;
+            <span>Feedback</span>
+        </div>
+
+        {% if messages %}
+            <div class="mt-4">
+                {% for message in messages %}
+                    <div style="background: rgba(220, 191, 174, 0.2); color: var(--text-dark); padding: 15px 30px; border-radius: 50px; display: inline-block; font-weight: 500;">
+                        <i class="fa fa-check-circle me-2" style="color: var(--bg-sand-dark);"></i> {{ message }}
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    </div>
+</section>
+
+<section class="pb-5 relative z-index-5">
+    <div class="container">
+        <div class="row">
+
+            <div class="col-lg-7 animate-up delay-1">
+                <div class="customer-reviews">
+                  {% for review in feedbacks %}
+                        <div class="review-card-3d">
+                            <div class="reviewer-header">
+                                <h4 class="reviewer-name">{{ review.user.name }}</h4>
+                                <span class="verified-badge"><i class="fa fa-check-circle"></i> Verified</span>
+                            </div>
+
+                            <div class="rating-display">
+                                <span>{{ review.ratings }} / 5</span>
+                                <i class="fa fa-star"></i>
+                            </div>
+
+                            <p class="review-text">"{{ review.comment }}"</p>
+                        </div>
+                    {% empty %}
+                        <div class="review-card-3d">
+                            <div class="reviewer-header">
+                                <h4 class="reviewer-name">Rahul Sharma</h4>
+                                <span class="verified-badge"><i class="fa fa-check-circle"></i> Verified</span>
+                            </div>
+                            <div class="rating-display">
+                                <span>5 / 5</span>
+                                <i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i>
+                            </div>
+                            <p class="review-text">"The UI on this site is absolutely incredible. TownKart feels like a premium luxury brand. The delivery was super fast and the packaging was excellent."</p>
+                        </div>
+
+                        <div class="review-card-3d">
+                            <div class="reviewer-header">
+                                <h4 class="reviewer-name">Anjali Desai</h4>
+                                <span class="verified-badge"><i class="fa fa-check-circle"></i> Verified</span>
+                            </div>
+                            <div class="rating-display">
+                                <span>4 / 5</span>
+                                <i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star-o" style="color: #e0e0e0;"></i>
+                            </div>
+                            <p class="review-text">"Great collection! The animations and the aesthetic styling make shopping here feel like an exclusive experience. Highly recommend!"</p>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div class="col-lg-5 animate-up delay-2">
+                <div class="form-glass-card">
+                    <h3 class="form-title">Share Your Thoughts</h3>
+                   <form method="POST" action="/submit_feedback/">
+                        {% csrf_token %}
+
+
+
+                        <div class="form-group mb-4">
+                            <label>Your Rating</label>
+                            <div class="glowing-stars">
+                                <input type="radio" name="rating" id="star5" value="5" required>
+                                <label for="star5" class="fa fa-star"></label>
+
+                                <input type="radio" name="rating" id="star4" value="4">
+                                <label for="star4" class="fa fa-star"></label>
+
+                                <input type="radio" name="rating" id="star3" value="3">
+                                <label for="star3" class="fa fa-star"></label>
+
+                                <input type="radio" name="rating" id="star2" value="2">
+                                <label for="star2" class="fa fa-star"></label>
+
+                                <input type="radio" name="rating" id="star1" value="1">
+                                <label for="star1" class="fa fa-star"></label>
+                            </div>
+                        </div>
+
+                        <div class="form-group mb-4">
+                            <label for="message">Your Review</label>
+                            <textarea name="message" class="glass-input" id="message" rows="4" placeholder="Tell us about your experience..." required style="resize: none;"></textarea>
+                        </div>
+
+                        <button type="submit" class="btn-super-dark">Submit Feedback</button>
+                    </form>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</section>
+
+{% endblock %}

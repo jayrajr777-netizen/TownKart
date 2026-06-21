@@ -1,0 +1,625 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="description" content="TownKart Premium E-Commerce">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>TownKart | Premium Collection</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Jost:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}" type="text/css">
+    <link rel="stylesheet" href="{% static 'css/font-awesome.min.css' %}" type="text/css">
+    <link rel="stylesheet" href="{% static 'css/themify-icons.css' %}" type="text/css">
+    <link rel="stylesheet" href="{% static 'css/elegant-icons.css' %}" type="text/css">
+    <link rel="stylesheet" href="{% static 'css/owl.carousel.min.css' %}" type="text/css">
+    <link rel="stylesheet" href="{% static 'css/nice-select.css' %}" type="text/css">
+    <link rel="stylesheet" href="{% static 'css/jquery-ui.min.css' %}" type="text/css">
+    <link rel="stylesheet" href="{% static 'css/slicknav.min.css' %}" type="text/css">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}" type="text/css">
+
+    <style>
+        /* --- Core Variables synced with TownKart Heritage Aesthetic --- */
+        :root {
+            --bg-blush: #fdfbfb;
+            --cream: #FAF7F2;
+            --terracotta: #C4622D;
+            --terracotta-light: #E07A4A;
+            --bg-sand: #dcbfae;
+            --bg-sand-dark: #c4a491;
+            --text-dark: #1C1C1A;
+            --text-muted: #8A8278;
+            --charcoal: #1C1C1A;
+            --3d-shadow: 0 15px 35px rgba(28, 28, 26, 0.05);
+            --3d-shadow-hover: 0 30px 60px rgba(196, 98, 45, 0.15);
+        }
+
+        /* --- Custom Luxury Scrollbar --- */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: var(--cream); }
+        ::-webkit-scrollbar-thumb { background: var(--terracotta-light); border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--terracotta); }
+
+        /* Smooth Page Load */
+        @keyframes pageFadeIn {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        body {
+            background-color: var(--cream);
+            font-family: 'Jost', sans-serif;
+            color: var(--text-dark);
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+            animation: pageFadeIn 0.8s cubic-bezier(0.165, 0.84, 0.44, 1) forwards;
+        }
+
+        h1, h2, h3, h4, h5, h6 { font-family: 'Playfair Display', serif; color: var(--text-dark); }
+
+        /* --- Custom Premium Preloader --- */
+        #preloder { position: fixed; width: 100%; height: 100%; top: 0; left: 0; z-index: 999999; background: var(--cream); display: flex; align-items: center; justify-content: center; transition: opacity 0.6s ease, visibility 0.6s ease; }
+        .tk-loader {
+            width: 50px; height: 50px; border-radius: 50%; border: 3px solid transparent; border-top-color: var(--terracotta);
+            animation: spin 1s cubic-bezier(0.42, 0, 0.58, 1) infinite;
+        }
+        .tk-loader::before {
+            content: ''; position: absolute; top: 5px; left: 5px; right: 5px; bottom: 5px; border-radius: 50%;
+            border: 3px solid transparent; border-top-color: var(--charcoal); animation: spin 2s cubic-bezier(0.42, 0, 0.58, 1) infinite reverse;
+        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        /* --- Floating Top Announcement Pill --- */
+        .top-pill-wrap { display: flex; justify-content: center; padding-top: 15px; position: relative; z-index: 1001; }
+        .announcement-pill {
+            background: linear-gradient(135deg, var(--terracotta), var(--charcoal)); color: #fff; padding: 8px 30px; border-radius: 50px;
+            font-size: 11px; font-weight: 500; letter-spacing: 2px; text-transform: uppercase; box-shadow: 0 10px 20px rgba(196, 98, 45, 0.2);
+        }
+        .announcement-pill a { color: #E6BA5C; margin-left: 10px; text-decoration: none; font-weight: 700; transition: color 0.3s; }
+        .announcement-pill a:hover { color: #fff; text-shadow: 0 0 8px rgba(255,255,255,0.5); }
+
+        /* ══════════════════════════════════════════════════════
+           CREATIVE WARM GLASS HEADER
+           ══════════════════════════════════════════════════════ */
+      .glass-header {
+            width: 96%; max-width: 1400px; margin: 15px auto;
+            /* --- NEW SOFT CREAM GLASS --- */
+            background: linear-gradient(135deg, rgba(253, 251, 251, 0.95) 0%, rgba(220, 191, 174, 0.25) 100%);
+            backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px);
+            border: 1px solid rgba(220, 191, 174, 0.3);
+            /* ---------------------------- */
+            border-top: 1px solid rgba(255, 255, 255, 0.8);
+            border-radius: 50px; position: sticky; top: 20px; z-index: 1000;
+            box-shadow: 0 15px 35px rgba(28, 28, 26, 0.05), inset 0 0 20px rgba(255, 255, 255, 0.3);
+            transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+        }
+
+        .header-inner {
+            height: 85px; padding: 0 35px;
+            display: flex; align-items: center; justify-content: space-between;
+        }
+        .header-left { flex: 1; display: flex; justify-content: flex-start; }
+        .header-center { display: flex; justify-content: center; }
+        .header-right { flex: 1; display: flex; justify-content: flex-end; align-items: center; }
+
+        /* Nav Links */
+        .nav-menu ul { list-style: none; margin: 0; padding: 0; display: flex; gap: 5px; }
+        .nav-menu ul li { position: relative; }
+        .nav-menu ul li a {
+            color: var(--text-dark); text-decoration: none; font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: 1.5px;
+            padding: 12px 18px; transition: color 0.3s; position: relative; z-index: 1; display: inline-block;
+        }
+        /* Active/Hover Nav Pill */
+        .nav-menu ul li a::before {
+            content: ''; position: absolute; inset: 0; background: rgba(196, 98, 45, 0.1); border-radius: 30px; z-index: -1; transform: scale(0.8);
+            opacity: 0; transition: all 0.3s cubic-bezier(0.165, 0.84, 0.44, 1);
+        }
+        .nav-menu ul li:hover > a { color: var(--terracotta); }
+        .nav-menu ul li:hover > a::before, .nav-menu ul li.active > a::before { transform: scale(1); opacity: 1; border: 1px solid rgba(196, 98, 45, 0.15); }
+        .nav-menu ul li.active > a { color: var(--terracotta); }
+
+        /* Dropdown */
+        .nav-menu ul li .dropdown {
+            position: absolute; left: 0; top: 140%; width: 220px;
+            background: rgba(250, 247, 242, 0.95); backdrop-filter: blur(25px);
+            border: 1px solid rgba(196, 98, 45, 0.15); border-radius: 24px; opacity: 0; visibility: hidden; transform: translateY(20px);
+            transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1); box-shadow: 0 25px 50px rgba(28, 28, 26, 0.1); z-index: 99;
+            display: flex; flex-direction: column; padding: 20px 10px; gap: 5px; pointer-events: none;
+        }
+        .nav-menu ul li:hover .dropdown { opacity: 1; visibility: visible; top: 110%; transform: translateY(0); pointer-events: auto; }
+        .nav-menu ul li .dropdown li a { padding: 10px 20px; font-size: 13px; color: var(--text-muted); border-radius: 15px; background: transparent !important; }
+        .nav-menu ul li .dropdown li a:hover { color: var(--terracotta); background: rgba(196, 98, 45, 0.08) !important; padding-left: 25px; }
+
+        /* Logo */
+        .brand-logo {
+            font-family: 'Playfair Display', serif; font-size: 34px; font-weight: 700; text-decoration: none; letter-spacing: -1px;
+            color: var(--charcoal); transition: transform 0.3s ease; white-space: nowrap;
+        }
+        .brand-logo:hover { transform: translateY(-2px); color: var(--terracotta); }
+        .brand-logo span { color: var(--terracotta); font-size: 44px; line-height: 0; }
+
+        /* Actions area */
+        .header-actions { display: flex; align-items: center; gap: 15px; list-style: none; margin: 0; padding: 0; }
+
+        /* SEARCH BAR */
+        .header-search-form {
+            display: flex; align-items: center; background: rgba(255,255,255,0.7); border: 1px solid rgba(196, 98, 45, 0.15); border-radius: 50px;
+            padding: 5px 20px; transition: all 0.3s ease; box-shadow: inset 0 2px 5px rgba(0,0,0,0.02);
+        }
+        .header-search-form:focus-within {
+            background: #ffffff; border-color: var(--terracotta); box-shadow: 0 5px 15px rgba(196, 98, 45, 0.15);
+        }
+        .header-search-form input {
+            border: none; background: transparent; outline: none; font-size: 14px; font-weight: 500;
+            color: var(--text-dark); width: 140px; padding: 5px 0; transition: width 0.3s;
+        }
+        .header-search-form input::placeholder { color: #aaa; font-weight: 400; }
+        .header-search-form input:focus { width: 190px; }
+        .header-search-form button {
+            background: none; border: none; color: var(--text-dark); cursor: pointer; font-size: 16px; padding: 0; transition: 0.3s;
+        }
+        .header-search-form button:hover { color: var(--terracotta); transform: scale(1.1); }
+
+       /* 3D Icons */
+        .action-btn-3d {
+            width: 48px; height: 48px; border-radius: 50%; background: rgba(255,255,255,0.8); color: var(--charcoal) !important; display: flex; align-items: center; justify-content: center; font-size: 18px; text-decoration: none; box-shadow: 0 10px 20px rgba(0,0,0,0.04); border: 1px solid rgba(196, 98, 45, 0.15); transition: all 0.4s; position: relative; cursor: pointer; outline: none;
+        }
+        .action-btn-3d:focus, .action-btn-3d:active, .action-btn-3d:visited {
+            color: var(--charcoal) !important;
+        }
+        .action-btn-3d:hover {
+            background: var(--terracotta) !important; color: #fff !important; transform: translateY(-3px); box-shadow: 0 10px 20px rgba(196, 98, 45, 0.2); border-color: var(--terracotta);
+        }
+        .action-btn-3d .badge-count {
+            position: absolute; top: -3px; right: -3px; background: var(--charcoal); color: #fff; font-size: 10px; font-weight: 600; width: 20px; height: 20px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 2px solid #fff;
+        }
+
+        .auth-links { margin-left: 15px; border-left: 1px solid rgba(196, 98, 45, 0.2); padding-left: 20px; display: flex; gap: 12px; align-items: center; }
+        .auth-links a { font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--charcoal); text-decoration: none; transition: 0.3s; }
+        .auth-links a:hover { color: var(--terracotta); }
+
+        /* --- Navigation Profile Avatar Styling --- */
+        .nav-user-wrap {
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .nav-profile-avatar {
+            width: 35px;
+            height: 35px;
+            background: #e7ab3c; /* TownKart Gold */
+            color: #ffffff;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: 700;
+            overflow: hidden;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+        .nav-profile-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .user-name-link {
+            font-weight: 600;
+            color: #252525 !important;
+            text-transform: capitalize;
+        }
+
+        /* --- Footer --- */
+        .footer-3d-wrap { padding: 0 20px 40px; margin-top: 100px; }
+        .footer-glass { background: rgba(250, 247, 242, 0.7); backdrop-filter: blur(20px); border-radius: 50px; padding: 80px 60px 40px; box-shadow: 0 25px 60px rgba(28, 28, 26, 0.05); border: 1px solid rgba(196, 98, 45, 0.15); position: relative; overflow: hidden; }
+        .footer-glass::before { content: ''; position: absolute; width: 400px; height: 400px; background: rgba(196, 98, 45, 0.1); border-radius: 50%; top: -150px; left: -100px; filter: blur(80px); z-index: 0; }
+        .footer-glass > div { position: relative; z-index: 1; }
+        .footer-glass h6 { font-family: 'Jost', sans-serif; font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 30px; color: var(--terracotta); }
+        .footer-glass ul li a { color: var(--text-muted); font-size: 15px; text-decoration: none; line-height: 2.8; transition: all 0.3s ease; display: inline-block; position: relative; }
+        .footer-glass ul li a::after { content: ''; position: absolute; width: 0; height: 1px; bottom: 5px; left: 0; background-color: var(--terracotta); transition: width 0.3s ease; }
+        .footer-glass ul li a:hover { color: var(--charcoal); transform: translateX(5px); }
+        .footer-glass ul li a:hover::after { width: 100%; }
+
+        /* Hide legacy */
+        .header-top, .depart-btn { display: none !important; }
+
+        @media (max-width: 1199px) {
+            .header-search-form input { width: 110px; }
+            .header-search-form input:focus { width: 150px; }
+            .nav-menu ul li a { padding: 12px 10px; }
+        }
+
+        @media (max-width: 991px) {
+            .glass-header { width: 100%; border-radius: 0; margin: 0; top: 0; border: none; border-bottom: 1px solid rgba(196, 98, 45, 0.2); }
+            .header-inner { padding: 0 20px; }
+            .auth-links, .nav-menu.d-none, .header-search-form { display: none; }
+            .slicknav_menu { background: transparent; padding: 0; margin-top: 15px; }
+            .slicknav_btn { background-color: var(--terracotta); border-radius: 12px; }
+            .footer-glass { padding: 50px 30px; border-radius: 30px; }
+        }
+    </style>
+</head>
+
+<body>
+    <div id="preloder">
+        <div class="tk-loader"></div>
+    </div>
+
+    {% if messages %}
+        <div id="toast-container" style="position: fixed; top: 30px; right: 30px; z-index: 9999; display: flex; flex-direction: column; gap: 10px;">
+            {% for message in messages %}
+                <div class="custom-toast" style="
+                    background: {% if message.tags == 'error' %}#d9534f{% else %}#222{% endif %};
+                    color: #fff;
+                    padding: 16px 24px;
+                    border-radius: 12px;
+                    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+                    display: flex;
+                    align-items: center;
+                    justify-content: space-between;
+                    min-width: 300px;
+                    font-family: 'Jost', sans-serif;
+                    font-weight: 500;
+                    transform: translateX(120%);
+                    animation: slideInRight 0.5s forwards ease-out;
+                ">
+
+                    <span style="display: flex; align-items: center; gap: 10px;">
+                        {% if message.tags == 'error' %}
+                            <i class="ti-close" style="font-size: 18px; font-weight: bold;"></i>
+                        {% else %}
+                            <i class="ti-check" style="font-size: 18px; font-weight: bold; color: #5cb85c;"></i>
+                        {% endif %}
+                        {{ message }}
+                    </span>
+
+                    <button type="button" style="background: none; border: none; color: #fff; font-size: 24px; cursor: pointer; margin-left: 20px; line-height: 1;" onclick="this.parentElement.style.display='none';">&times;</button>
+                </div>
+            {% endfor %}
+        </div>
+
+        <style>
+            @keyframes slideInRight {
+                0% { transform: translateX(120%); }
+                100% { transform: translateX(0); }
+            }
+        </style>
+
+        <script>
+            // Automatically hide the message after 5 seconds
+            document.addEventListener('DOMContentLoaded', function() {
+                setTimeout(function() {
+                    let toasts = document.querySelectorAll('.custom-toast');
+                    toasts.forEach(function(toast) {
+                        toast.style.transition = "opacity 0.6s ease, transform 0.6s ease";
+                        toast.style.opacity = "0";
+                        toast.style.transform = "translateX(120%)";
+                        setTimeout(() => toast.style.display = "none", 600); // Wait for animation to finish before removing
+                    });
+                }, 5000); // 5000 milliseconds = 5 seconds
+            });
+        </script>
+    {% endif %}
+    <div class="top-pill-wrap d-none d-md-flex">
+        <div class="announcement-pill">
+            Empowering Local Vendors | Free Shipping over ₹999 <a href="/shop">Discover</a>
+        </div>
+    </div>
+
+    <header class="glass-header">
+        <div class="header-inner">
+
+            <div class="header-left d-none d-lg-flex">
+                <nav class="nav-menu">
+                    <ul>
+                        <li class="{% if request.path == '/' %}active{% endif %}"><a href="/">Home</a></li>
+
+                        {% if request.session.log_id %}
+                            {% if request.session.log_role == 'User' %}
+                                <li class="{% if '/about' in request.path %}active{% endif %}"><a href="/about">About</a></li>
+                                <li class="{% if '/contact' in request.path %}active{% endif %}"><a href="/contact">Contact</a></li>
+                                <li class="{% if request.path == '/shop/' or request.path == '/shop' %}active{% endif %}"><a href="/shop">Shop</a></li>
+
+                                <li class="{% if '/shoppingcart' in request.path or '/checkout' in request.path or '/orderhistory' in request.path or '/feedback' in request.path %}active{% endif %}">
+                                    <a href="#">My Account <i class="ti-angle-down" style="font-size: 9px; margin-left: 3px;"></i></a>
+                                    <ul class="dropdown">
+                                        <li class="{% if '/shoppingcart' in request.path %}active{% endif %}"><a href="/shoppingcart">Shopping Cart</a></li>
+
+                                        <li class="{% if '/orderhistory' in request.path %}active{% endif %}"><a href="/orderhistory">Order History</a></li>
+                                        <li class="{% if '/feedback' in request.path %}active{% endif %}"><a href="/feedback">Feedback</a></li>
+                                    </ul>
+                                </li>
+                            {% elif request.session.log_role == 'Shop' %}
+                                <li class="{% if '/addproduct' in request.path %}active{% endif %}"><a href="/addproduct">Add Product</a></li>
+                                <li class="{% if '/manageproduct' in request.path %}active{% endif %}"><a href="/manageproduct">Manage Product</a></li>
+                                <li class="{% if '/manageorders' in request.path %}active{% endif %}"><a href="/manageorders">Manage Orders</a></li>
+                                <li class="{% if '/viewfeedback' in request.path %}active{% endif %}"><a href="/viewfeedback">View Feedback</a></li>
+                            {% endif %}
+                        {% else %}
+                            <li class="{% if '/about' in request.path %}active{% endif %}"><a href="/about">About</a></li>
+                            <li class="{% if '/contact' in request.path %}active{% endif %}"><a href="/contact">Contact</a></li>
+                            <li class="{% if request.path == '/shop/' or request.path == '/shop' %}active{% endif %}"><a href="/shop">Shop</a></li>
+                        {% endif %}
+                    </ul>
+                </nav>
+            </div>
+
+            <div class="header-center">
+                <a href="/" class="brand-logo">TownKart<span>.</span></a>
+            </div>
+
+            <div class="header-right">
+                <ul class="header-actions">
+                    <li class="d-none d-lg-block">
+                        <form action="/shop/" method="GET" class="header-search-form">
+                            <input type="text" name="query" placeholder="Search products..." autocomplete="off" required>
+                            <button type="submit"><i class="ti-search"></i></button>
+                        </form>
+                    </li>
+
+                  <li class="d-none d-lg-block" style="margin-left: 15px;">
+                        <a href="javascript:void(0)" class="action-btn-3d notranslate" translate="no" data-toggle="modal" data-target="#languageModal" title="Change Language">
+                            <i class="fa fa-language" translate="no" style="font-size: 22px;"></i>
+                        </a>
+                    </li>
+                    {% if request.session.log_role == 'User' %}
+                        <li>
+                            <a href="/wishlist/" class="action-btn-3d" title="Wishlist">
+                                <i class="icon_heart_alt"></i>
+                                {% if request.session.wishlist_count %}
+                                    <span class="badge-count">{{ request.session.wishlist_count }}</span>
+                                {% endif %}
+                            </a>
+                        </li>
+                        <li>
+                            <a href="/shoppingcart" class="action-btn-3d" title="Shopping Bag">
+                                <i class="icon_bag_alt"></i>
+                                {% if request.session.cart_count %}
+                                    <span class="badge-count">{{ request.session.cart_count }}</span>
+                                {% endif %}
+                            </a>
+                        </li>
+                    {% endif %}
+                </ul>
+
+                <div class="auth-links d-none d-lg-flex">
+                    {% if request.session.log_id %}
+                    <div class="nav-user-wrap">
+                                <div class="nav-profile-avatar">
+                                    {% if request.session.log_image %}
+                                        <img src="/media/{{ request.session.log_image }}" alt="Profile">
+                                    {% else %}
+                                        {{ request.session.log_name|make_list|first|upper }}
+                                    {% endif %}
+                                </div>
+
+                                {% if request.session.log_role == 'Shop' %}
+                                    <a href="/seller_profile" class="user-name-link">{{ request.session.log_name }}</a>
+                                {% else %}
+                                    <a href="/myprofile" class="user-name-link">{{ request.session.log_name }}</a>
+                                {% endif %}
+
+                                <a href="/logout" style="margin-left: 10px;"><i class="fa fa-sign-out me-1"></i> Logout</a>
+                    </div>
+                    {% else %}
+                        <a href="/login"><i class="fa fa-user me-1"></i> Login</a>
+                        <a href="/register"><i class="fa fa-user-plus me-1"></i> Register</a>
+                    {% endif %}
+                </div>
+            </div>
+
+        </div>
+
+        <div id="mobile-menu-wrap" class="px-3"></div>
+    </header>
+
+   <main style="min-height: 60vh; position: relative; z-index: 1;">
+
+        {% block main %}
+        {% endblock %}
+    </main>
+
+    <footer class="footer-3d-wrap">
+        <div class="container-fluid px-lg-4">
+            <div class="footer-glass">
+                <div class="row">
+                    <div class="col-lg-4 mb-5 mb-lg-0">
+                        <a href="/" class="brand-logo" style="position: static; transform: none; font-size: 36px; -webkit-text-fill-color: var(--text-dark);">TownKart<span>.</span></a>
+                        <p class="mt-4" style="color: var(--text-muted); font-size: 15px; max-width: 320px; line-height: 1.9;">
+                            Connecting local buyers and sellers digitally. Support small-town shopkeepers, buy rare books, and enjoy smart features like auto-purchase and location-based discovery.
+                        </p>
+                        <div class="mt-4 d-flex gap-3">
+                            <a href="#" class="action-btn-3d" style="width: 45px; height: 45px; font-size: 16px;"><i class="fa fa-instagram"></i></a>
+                            <a href="#" class="action-btn-3d" style="width: 45px; height: 45px; font-size: 16px;"><i class="fa fa-twitter"></i></a>
+                            <a href="#" class="action-btn-3d" style="width: 45px; height: 45px; font-size: 16px;"><i class="fa fa-pinterest"></i></a>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-2 offset-lg-2 col-md-4 col-sm-6 mb-4">
+                        <h6>Discover</h6>
+                        <ul class="list-unstyled">
+                            <li><a href="/shop">New Arrivals</a></li>
+                            <li><a href="/shop">Local Crafts</a></li>
+                            <li><a href="/shop">Rare Books</a></li>
+                        </ul>
+                    </div>
+
+                    <div class="col-lg-2 col-md-4 col-sm-6 mb-4">
+                        <h6>TownKart</h6>
+                        <ul class="list-unstyled">
+                            <li><a href="/about">About Us</a></li>
+                            <li><a href="/contact">Contact</a></li>
+                            <li><a href="/feedback">Vendor Program</a></li>
+                        </ul>
+                    </div>
+
+                    <div class="col-lg-2 col-md-4 col-sm-6 mb-4">
+                        <h6>Services</h6>
+                        <ul class="list-unstyled">
+                            <li><a href="/shoppingcart">Shopping Cart</a></li>
+                            <li><a href="/orderhistory">Track Order</a></li>
+                            <li><a href="#">Shipping Info</a></li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="row mt-5 pt-4" style="border-top: 1px solid rgba(196, 98, 45, 0.1);">
+                    <div class="col-md-6 text-center text-md-start mb-3 mb-md-0">
+                        <p style="color: #999; font-size: 13px; margin: 0;">&copy; <script>document.write(new Date().getFullYear());</script> TownKart. Made in India.</p>
+                    </div>
+                    <div class="col-md-6 text-center text-md-end">
+                        <p style="color: var(--terracotta); font-size: 13px; margin: 0; text-transform: uppercase; letter-spacing: 2px; font-weight: 600;">India</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <div class="modal fade" id="languageModal" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+            <div class="modal-content" style="background: rgba(250, 247, 242, 0.95); backdrop-filter: blur(25px); border-radius: 30px; border: 1px solid rgba(196, 98, 45, 0.2); box-shadow: 0 30px 60px rgba(0,0,0,0.15);">
+                <div class="modal-header" style="border: none; padding: 30px 30px 10px;">
+                    <h5 class="modal-title" style="font-family: 'Playfair Display', serif; font-weight: 700; color: var(--charcoal); font-size: 28px;">Select Your Language</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close" style="outline: none; background: transparent; border: none; cursor: pointer; transition: 0.3s;">
+                        <span aria-hidden="true" style="font-size: 35px; color: var(--terracotta);">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body" style="padding: 10px 30px 40px;">
+                    <p style="color: var(--text-muted); margin-bottom: 30px; font-size: 15px;">Shop across India in your regional language. Select below:</p>
+
+                    <div class="row g-4">
+                        <div class="col-4 mb-3">
+                            <div class="lang-card" onclick="changeLang('en')">
+                                <span class="lang-icon">A</span>
+                                <span class="lang-name">English</span>
+                            </div>
+                        </div>
+                        <div class="col-4 mb-3">
+                            <div class="lang-card" onclick="changeLang('gu')">
+                                <span class="lang-icon">ગુ</span>
+                                <span class="lang-name">ગુજરાતી</span>
+                            </div>
+                        </div>
+                        <div class="col-4 mb-3">
+                            <div class="lang-card" onclick="changeLang('hi')">
+                                <span class="lang-icon">हि</span>
+                                <span class="lang-name">हिन्दी</span>
+                            </div>
+                        </div>
+                        <div class="col-4 mb-3">
+                            <div class="lang-card" onclick="changeLang('mr')">
+                                <span class="lang-icon">म</span>
+                                <span class="lang-name">मराठी</span>
+                            </div>
+                        </div>
+                        <div class="col-4 mb-3">
+                            <div class="lang-card" onclick="changeLang('bn')">
+                                <span class="lang-icon">অ</span>
+                                <span class="lang-name">বাংলা</span>
+                            </div>
+                        </div>
+                        <div class="col-4 mb-3">
+                            <div class="lang-card" onclick="changeLang('pa')">
+                                <span class="lang-icon">ਪੰ</span>
+                                <span class="lang-name">ਪੰਜਾਬੀ</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="google_translate_element" style="display:none;"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+   <style>
+        /* 3D Language Cards Styling */
+        .lang-card {
+            background: #fff; border: 1px solid rgba(196, 98, 45, 0.1); border-radius: 20px;
+            padding: 25px 10px; text-align: center; cursor: pointer; transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.02); height: 100%; display: flex; flex-direction: column; justify-content: center;
+        }
+        .lang-card:hover {
+            transform: translateY(-8px) scale(1.03); background: linear-gradient(135deg, var(--terracotta), var(--terracotta-light)); border-color: var(--terracotta);
+            box-shadow: 0 15px 30px rgba(196, 98, 45, 0.25);
+        }
+        .lang-icon {
+            display: block; font-size: 28px; font-weight: 700; color: var(--terracotta); margin-bottom: 12px; transition: 0.3s;
+        }
+        .lang-name {
+            display: block; font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; color: var(--charcoal); transition: 0.3s;
+        }
+        .lang-card:hover .lang-icon, .lang-card:hover .lang-name { color: #fff; }
+
+        /* ========================================================
+           ULTRA-STRICT GOOGLE TRANSLATE BANNER KILLER (UPDATED)
+           ======================================================== */
+        iframe.goog-te-banner-frame {
+            display: none !important;
+        }
+        /* આ કોડ body ને નીચે જતું અટકાવશે */
+        body, html {
+            top: 0px !important;
+            position: static !important;
+        }
+        /* નવા Google Translate popups ને હટાવવા માટે */
+        .VIpgJd-Zvi9od-ORHb-OEVmcd,
+        .skiptranslate > iframe,
+        #goog-gt-tt,
+        .goog-te-balloon-frame {
+            display: none !important;
+        }
+        .goog-text-highlight {
+            background-color: transparent !important;
+            box-shadow: none !important;
+        }
+    </style>
+
+    <script type="text/javascript">
+        function googleTranslateElementInit() {
+            new google.translate.TranslateElement({
+                pageLanguage: 'en',
+                // Ahiya navi bhashao add kari che (mr=Marathi, bn=Bengali, pa=Punjabi)
+                includedLanguages: 'en,gu,hi,mr,bn,pa',
+                autoDisplay: false
+            }, 'google_translate_element');
+        }
+
+        function changeLang(langCode) {
+            var select = document.querySelector('.goog-te-combo');
+            if (select) {
+                select.value = langCode;
+                select.dispatchEvent(new Event('change'));
+                $('#languageModal').modal('hide');
+            }
+        }
+    </script>
+    <script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+
+    <script>
+        // Custom smooth removal of the preloader that doesn't block clicks
+        window.addEventListener('load', function() {
+            var preloader = document.getElementById('preloder');
+            preloader.style.opacity = '0';
+            preloader.style.visibility = 'hidden';
+            preloader.style.pointerEvents = 'none';
+            setTimeout(function() { preloader.style.display = 'none'; }, 600);
+        });
+    </script>
+    <script src="{% static 'js/jquery-3.3.1.min.js' %}"></script>
+    <script src="{% static 'js/bootstrap.min.js' %}"></script>
+    <script src="{% static 'js/jquery-ui.min.js' %}"></script>
+    <script src="{% static 'js/jquery.countdown.min.js' %}"></script>
+    <script src="{% static 'js/jquery.nice-select.min.js' %}"></script>
+    <script src="{% static 'js/jquery.zoom.min.js' %}"></script>
+    <script src="{% static 'js/jquery.dd.min.js' %}"></script>
+    <script src="{% static 'js/jquery.slicknav.js' %}"></script>
+    <script src="{% static 'js/owl.carousel.min.js' %}"></script>
+    <script src="{% static 'js/main.js' %}"></script>
+</body>
+
+</html>

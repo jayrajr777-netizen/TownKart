@@ -1,0 +1,550 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block main %}
+
+<style>
+    /* =========================================
+       ULTRA-PREMIUM EDITORIAL ABOUT US (3D UI)
+       ========================================= */
+    :root {
+        --bg-blush: #fdfbfb;
+        --bg-sand: #dcbfae;
+        --bg-sand-dark: #c4a491;
+        --text-dark: #1a1a1a;
+        --text-muted: #888888;
+        --gold: #e7ab3c;
+        --3d-shadow: 0 20px 40px rgba(0, 0, 0, 0.08);
+        --3d-shadow-hover: 0 30px 50px rgba(220, 191, 174, 0.4);
+    }
+
+    body {
+        background-color: var(--bg-blush);
+        font-family: 'Jost', sans-serif;
+        overflow-x: hidden;
+    }
+
+    /* --- Animations --- */
+    @keyframes fadeUp {
+        0% { opacity: 0; transform: translateY(40px); }
+        100% { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes floatBlob {
+        0% { transform: translate(0, 0) scale(1); }
+        33% { transform: translate(30px, -50px) scale(1.1); }
+        66% { transform: translate(-20px, 20px) scale(0.9); }
+        100% { transform: translate(0, 0) scale(1); }
+    }
+    .animate-up { opacity: 0; animation: fadeUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+    .delay-1 { animation-delay: 0.1s; }
+    .delay-2 { animation-delay: 0.3s; }
+    .delay-3 { animation-delay: 0.5s; }
+
+    /* --- Header & Breadcrumb --- */
+    .about-hero {
+        position: relative;
+        padding: 80px 0 60px;
+        text-align: center;
+        overflow: hidden;
+    }
+    .blob-1, .blob-2 {
+        position: absolute;
+        filter: blur(80px);
+        border-radius: 50%;
+        z-index: 0;
+        opacity: 0.6;
+        animation: floatBlob 10s infinite ease-in-out;
+    }
+    .blob-1 { width: 400px; height: 400px; background: var(--bg-sand); top: -10%; left: 15%; }
+    .blob-2 { width: 350px; height: 350px; background: #e0d4cc; bottom: -20%; right: 15%; animation-delay: -5s; }
+
+    .page-title {
+        position: relative;
+        z-index: 2;
+        font-family: 'Playfair Display', serif;
+        font-size: 4rem;
+        font-weight: 700;
+        color: var(--text-dark);
+        letter-spacing: -1px;
+        margin-bottom: 10px;
+    }
+    .page-subtitle {
+        position: relative;
+        z-index: 2;
+        font-size: 1.2rem;
+        color: var(--text-muted);
+        margin-bottom: 20px;
+        font-weight: 500;
+    }
+
+    .breadcrumb-3d {
+        background: rgba(255, 255, 255, 0.6);
+        backdrop-filter: blur(15px);
+        border-radius: 50px;
+        padding: 12px 30px;
+        box-shadow: 0 10px 20px rgba(0,0,0,0.03), inset 0 0 0 1px rgba(255,255,255,0.8);
+        display: inline-block;
+        font-weight: 500;
+        font-size: 14px;
+        position: relative;
+        z-index: 2;
+    }
+    .breadcrumb-3d a { color: var(--text-dark); margin-right: 10px; transition: 0.3s; text-decoration: none;}
+    .breadcrumb-3d a:hover { color: var(--bg-sand-dark); }
+    .breadcrumb-3d span { color: var(--text-muted); }
+
+    /* --- Story Section --- */
+    .story-glass-box {
+        background: rgba(255, 255, 255, 0.75);
+        backdrop-filter: blur(30px);
+        border-radius: 40px;
+        padding: 60px;
+        box-shadow: var(--3d-shadow), inset 0 0 0 1px rgba(255,255,255,0.8);
+        position: relative;
+        z-index: 5;
+        text-align: center;
+        margin-bottom: 60px;
+    }
+    .about-watermark {
+        position: absolute;
+        font-size: 120px;
+        font-family: 'Playfair Display', serif;
+        font-weight: 900;
+        color: rgba(0,0,0,0.02);
+        top: -40px;
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: -1;
+        letter-spacing: 15px;
+        text-transform: uppercase;
+        user-select: none;
+    }
+    .story-glass-box h3 {
+        font-family: 'Playfair Display', serif;
+        font-size: 3rem;
+        font-weight: 700;
+        color: var(--text-dark);
+        margin-bottom: 25px;
+    }
+    .story-glass-box p {
+        color: #555;
+        line-height: 1.9;
+        font-size: 17px;
+        margin-bottom: 20px;
+        max-width: 800px;
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    /* --- Stats Section --- */
+    .stats-container {
+        display: flex;
+        justify-content: center;
+        flex-wrap: wrap;
+        gap: 60px;
+        margin: 50px auto 40px;
+        padding-top: 30px;
+        border-top: 1px solid rgba(0,0,0,0.05);
+        max-width: 900px;
+    }
+    .stat-item h4 {
+        font-family: 'Playfair Display', serif;
+        font-size: 42px;
+        font-weight: 700;
+        color: var(--text-dark);
+        margin-bottom: 5px;
+    }
+    .stat-item p {
+        font-size: 12px;
+        color: var(--text-muted);
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        margin: 0;
+        font-weight: 600;
+    }
+
+    /* --- 3D Feature Cards (Mission/Vision) --- */
+    .card-3d-feature {
+        background: #ffffff;
+        padding: 50px 30px 40px;
+        border-radius: 30px;
+        text-align: center;
+        box-shadow: 0 15px 35px rgba(0,0,0,0.04);
+        position: relative;
+        margin-top: 40px;
+        transition: all 0.4s ease;
+        height: 100%;
+        border: 1px solid rgba(255,255,255,0.9);
+    }
+    .card-3d-feature:hover {
+        transform: translateY(-15px);
+        box-shadow: var(--3d-shadow-hover);
+    }
+    .icon-wrapper-3d {
+        position: absolute;
+        top: -35px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 75px;
+        height: 75px;
+        background: var(--bg-sand);
+        border-radius: 25px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 15px 30px rgba(220, 191, 174, 0.4);
+        transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+    .card-3d-feature:hover .icon-wrapper-3d {
+        transform: translateX(-50%) rotate(15deg) scale(1.1);
+    }
+    .icon-wrapper-3d i {
+        color: #ffffff;
+        font-size: 28px;
+        margin: 0;
+    }
+    .card-3d-feature h4 {
+        font-family: 'Playfair Display', serif;
+        font-weight: 700;
+        color: var(--text-dark);
+        margin-bottom: 15px;
+        font-size: 24px;
+    }
+    .card-3d-feature p {
+        color: #666;
+        font-size: 15px;
+        line-height: 1.7;
+        margin: 0;
+    }
+
+    /* --- Why Choose Us (Benefit Boxes) --- */
+    .why-choose-us {
+        padding: 80px 0;
+    }
+    .section-title {
+        text-align: center;
+        margin-bottom: 60px;
+    }
+    .section-title h2 {
+        font-family: 'Playfair Display', serif;
+        font-size: 3rem;
+        font-weight: 700;
+        color: var(--text-dark);
+    }
+    .benefit-box {
+        display: flex;
+        align-items: flex-start;
+        background: rgba(255, 255, 255, 0.6);
+        backdrop-filter: blur(10px);
+        padding: 30px;
+        border-radius: 25px;
+        box-shadow: 0 10px 20px rgba(0,0,0,0.02);
+        transition: 0.3s;
+        height: 100%;
+        border: 1px solid rgba(255,255,255,0.8);
+    }
+    .benefit-box:hover {
+        transform: translateY(-5px);
+        background: #fff;
+        box-shadow: 0 15px 30px rgba(0,0,0,0.05);
+    }
+    .benefit-icon {
+        font-size: 30px;
+        color: var(--bg-sand-dark);
+        margin-right: 20px;
+        line-height: 1;
+        background: var(--bg-blush);
+        width: 60px; height: 60px;
+        display: flex; align-items: center; justify-content: center;
+        border-radius: 15px;
+    }
+    .benefit-text h5 {
+        font-family: 'Playfair Display', serif;
+        font-weight: 700;
+        margin-bottom: 10px;
+        font-size: 20px;
+        color: var(--text-dark);
+    }
+    .benefit-text p {
+        color: #777;
+        font-size: 15px;
+        margin: 0;
+        line-height: 1.6;
+    }
+
+    /* --- Meet The Team --- */
+    .team-card {
+        background: #fff;
+        border-radius: 30px;
+        overflow: hidden;
+        box-shadow: 0 15px 35px rgba(0,0,0,0.04);
+        transition: all 0.4s ease;
+        position: relative;
+        text-align: center;
+        margin-bottom: 30px;
+    }
+    .team-card:hover {
+        transform: translateY(-15px);
+        box-shadow: var(--3d-shadow-hover);
+    }
+    .team-img-wrapper {
+        width: 100%;
+        aspect-ratio: 3/4;
+        overflow: hidden;
+        background-color: var(--bg-sand); /* Fallback color */
+    }
+    .team-img-wrapper img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.6s ease;
+        filter: grayscale(20%);
+    }
+    .team-card:hover .team-img-wrapper img {
+        transform: scale(1.08);
+        filter: grayscale(0%);
+    }
+    .team-info {
+        position: absolute;
+        bottom: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 85%;
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(10px);
+        padding: 20px;
+        border-radius: 20px;
+        box-shadow: 0 10px 20px rgba(0,0,0,0.05);
+        transition: all 0.4s ease;
+        opacity: 0;
+    }
+    .team-card:hover .team-info {
+        opacity: 1;
+        bottom: 30px;
+    }
+    .team-info h5 {
+        font-family: 'Playfair Display', serif;
+        font-weight: 700;
+        color: var(--text-dark);
+        margin-bottom: 5px;
+        font-size: 18px;
+    }
+    .team-info span {
+        color: var(--text-muted);
+        font-size: 11px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 1.5px;
+    }
+    .team-social { margin-top: 10px; }
+    .team-social a {
+        display: inline-flex; align-items: center; justify-content: center;
+        width: 30px; height: 30px; border-radius: 50%;
+        margin: 0 3px; color: var(--text-dark); background: #fdfbfb;
+        font-size: 14px; transition: 0.3s; box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    }
+    .team-social a:hover { background: var(--bg-sand-dark); color: #fff; }
+
+    /* Button Styling */
+    .btn-super-dark {
+        display: inline-block;
+        background: linear-gradient(45deg, #1a1a1a, #333333);
+        color: #fff !important;
+        padding: 16px 40px;
+        border-radius: 50px;
+        font-size: 13px; font-weight: 600; letter-spacing: 2px; text-transform: uppercase;
+        border: none; cursor: pointer; text-decoration: none;
+        box-shadow: 0 20px 40px rgba(0,0,0,0.2), inset 0 2px 0 rgba(255,255,255,0.2);
+        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+    .btn-super-dark:hover {
+        transform: translateY(-6px);
+        box-shadow: 0 25px 45px rgba(0,0,0,0.3);
+    }
+
+    @media (max-width: 991px) {
+        .page-title { font-size: 3rem; }
+        .story-glass-box { padding: 40px 20px; margin-top: 20px; }
+    }
+</style>
+
+<section class="about-hero">
+    <div class="blob-1"></div>
+    <div class="blob-2"></div>
+    <div class="container relative z-index-2 animate-up">
+        <h1 class="page-title">Discover TownKart</h1>
+        <p class="page-subtitle">Elevating Your Everyday Lifestyle</p>
+        <div class="breadcrumb-3d mt-2">
+            <a href="/index"><i class="fa fa-home"></i> Home</a> &rsaquo;
+            <span>About Us</span>
+        </div>
+    </div>
+</section>
+
+<section class="about-section spad relative z-index-5">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-10">
+                <div class="story-glass-box animate-up delay-1">
+                    <div class="about-watermark">CRAFTED</div>
+                    <h3>Welcome to TownKart</h3>
+                    <p>Where premium quality meets everyday affordability. We didn't just want to build another online store; we wanted to create a highly curated digital destination for those who appreciate style, aesthetics, and seamless technology.</p>
+                    <p>Born out of a passion for fashion and a dedication to customer satisfaction, TownKart bridges the gap between high-end editorial collections and accessible pricing. We bring the best products directly to your doorstep, wrapped in an experience you'll love.</p>
+
+                    <div class="stats-container">
+                        <div class="stat-item">
+                            <h4>10K+</h4>
+                            <p>Curated Items</p>
+                        </div>
+                        <div class="stat-item">
+                            <h4>500+</h4>
+                            <p>Global Brands</p>
+                        </div>
+                        <div class="stat-item">
+                            <h4>99%</h4>
+                            <p>Happy Clients</p>
+                        </div>
+                        <div class="stat-item">
+                            <h4>24/7</h4>
+                            <p>Stylist Support</p>
+                        </div>
+                    </div>
+
+                    <a href="/shop" class="btn-super-dark animate-up delay-2">Explore The Collection</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="row" style="margin-top: 40px;">
+            <div class="col-lg-4 col-md-6 mb-5 mb-lg-0 animate-up delay-1">
+                <div class="card-3d-feature">
+                    <div class="icon-wrapper-3d"><i class="fa fa-bullseye"></i></div>
+                    <h4>Our Mission</h4>
+                    <p>To revolutionize the e-commerce landscape by providing a frictionless, highly aesthetic shopping experience. We aim to empower our community by offering sustainably sourced, premium products without the luxury markup.</p>
+                </div>
+            </div>
+            <div class="col-lg-4 col-md-6 mb-5 mb-lg-0 animate-up delay-2">
+                <div class="card-3d-feature">
+                    <div class="icon-wrapper-3d"><i class="fa fa-eye"></i></div>
+                    <h4>Our Vision</h4>
+                    <p>To become the definitive digital marketplace for modern shoppers—connecting communities with the premium brands they trust, while setting new standards in digital retail innovation.</p>
+                </div>
+            </div>
+            <div class="col-lg-4 col-md-12 animate-up delay-3">
+                <div class="card-3d-feature">
+                    <div class="icon-wrapper-3d"><i class="fa fa-diamond"></i></div>
+                    <h4>Our Promise</h4>
+                    <p>Innovation, uncompromised integrity, and an absolute dedication to the art of exceeding your expectations every single day. Welcome to the new standard of shopping.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="why-choose-us">
+    <div class="container">
+        <div class="section-title animate-up">
+            <h2>The TownKart Difference</h2>
+        </div>
+        <div class="row g-4">
+            <div class="col-lg-4 col-md-6 animate-up delay-1">
+                <div class="benefit-box">
+                    <div class="benefit-icon"><i class="fa fa-star"></i></div>
+                    <div class="benefit-text">
+                        <h5>Curated Excellence</h5>
+                        <p>Every item in our catalog—from clothing to accessories—is meticulously handpicked for its craftsmanship, durability, and style.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4 col-md-6 animate-up delay-2">
+                <div class="benefit-box">
+                    <div class="benefit-icon"><i class="fa fa-bolt"></i></div>
+                    <div class="benefit-text">
+                        <h5>Frictionless Shopping</h5>
+                        <p>Built with cutting-edge technology, our platform offers lightning-fast browsing, secure encrypted checkouts, and effortless navigation.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4 col-md-6 animate-up delay-3">
+                <div class="benefit-box">
+                    <div class="benefit-icon"><i class="fa fa-truck"></i></div>
+                    <div class="benefit-text">
+                        <h5>White-Glove Delivery</h5>
+                        <p>We know you want your items fast. We offer complimentary expedited shipping on premium orders and a streamlined hassle-free return policy.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="team-section">
+    <div class="container">
+        <div class="section-title animate-up">
+            <h2>The Visionaries</h2>
+            <p class="text-muted mt-2">The minds behind the TownKart experience.</p>
+        </div>
+        <div class="row justify-content-center">
+
+
+
+            <div class="col-lg-3 col-md-6 col-sm-6 mb-4 animate-up delay-2">
+                <div class="team-card">
+                    <div class="team-img-wrapper">
+                        <img src="{% static 'img/1000098719.jpg.jpeg' %}" alt="Het Umretiya">
+                    </div>
+                    <div class="team-info">
+                        <h5>Het Umretiya</h5>
+                        <span>Co-Founder & Developer</span>
+                        <div class="team-social">
+                            <a href="#"><i class="fa fa-linkedin"></i></a>
+                            <a href="#"><i class="fa fa-github"></i></a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+             <div class="col-lg-3 col-md-6 col-sm-6 mb-4 animate-up delay-1">
+                <div class="team-card">
+                    <div class="team-img-wrapper">
+                        <img src="{% static 'img/IMG_20251121_212523_407.jpg' %}" alt="Armyben Pipaliya">
+                    </div>
+                    <div class="team-info">
+                        <h5>Army Pipaliya</h5>
+                        <span>Co-Founder & Developer</span>
+                        <div class="team-social">
+                            <a href="#"><i class="fa fa-linkedin"></i></a>
+                            <a href="#"><i class="fa fa-github"></i></a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-3 col-md-6 col-sm-6 mb-4 animate-up delay-3">
+                <div class="team-card">
+                    <div class="team-img-wrapper">
+                        <img src="{% static 'img/Screenshot_2026-02-07-12-36-44-77_99c04817c0de5652397fc8b56c3b3817.jpg.jpeg' %}" alt="Jayrajsinh Rathod">
+                    </div>
+                    <div class="team-info">
+                        <h5>Jayrajsinh Rathod</h5>
+                        <span>Co-Founder & Developer</span>
+                        <div class="team-social">
+                            <a href="#"><i class="fa fa-linkedin"></i></a>
+                            <a href="#"><i class="fa fa-github"></i></a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</section>
+
+<!--<div class="container mb-5 pb-5 opacity-50 text-center animate-up delay-3" style="border-top: 1px solid rgba(0,0,0,0.05); padding-top: 50px;">-->
+<!--    <span style="font-family: 'Jost', sans-serif; font-size: 10px; color: var(&#45;&#45;text-muted); text-transform: uppercase; letter-spacing: 2px; display: block; margin-bottom: 20px;">Trusted Partners</span>-->
+<!--    <img src="{% static 'img/logo-carousel/logo-1.png' %}" class="mx-4" style="max-width: 90px; filter: grayscale(100%); transition: 0.3s;" onmouseover="this.style.filter='none'" onmouseout="this.style.filter='grayscale(100%)'">-->
+<!--    <img src="{% static 'img/logo-carousel/logo-2.png' %}" class="mx-4" style="max-width: 90px; filter: grayscale(100%); transition: 0.3s;" onmouseover="this.style.filter='none'" onmouseout="this.style.filter='grayscale(100%)'">-->
+<!--    <img src="{% static 'img/logo-carousel/logo-3.png' %}" class="mx-4" style="max-width: 90px; filter: grayscale(100%); transition: 0.3s;" onmouseover="this.style.filter='none'" onmouseout="this.style.filter='grayscale(100%)'">-->
+<!--    <img src="{% static 'img/logo-carousel/logo-4.png' %}" class="mx-4 d-none d-md-inline" style="max-width: 90px; filter: grayscale(100%); transition: 0.3s;" onmouseover="this.style.filter='none'" onmouseout="this.style.filter='grayscale(100%)'">-->
+<!--</div>-->
+
+{% endblock %}

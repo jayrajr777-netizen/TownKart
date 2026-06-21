@@ -1,0 +1,925 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block main %}
+
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+<style>
+    /* ==========================================================================
+       10/10 SLEEK & PREMIUM E-COMMERCE THEME - TOWNKART (RE-DESIGNED)
+       ========================================================================== */
+    :root {
+        --bg-white: #ffffff;
+        --bg-offwhite: #fdfaf7;
+        --bg-warm-grey: #f2ede8;
+        --bg-dark-ochre: #d5bca4;
+
+        --text-dark: #121212;
+        --text-muted: #6a6a6a;
+        --text-light: #9c9c9c;
+
+        --font-serif: 'Playfair Display', serif;
+        --font-sans: 'Outfit', sans-serif;
+
+        --radius-xl: 40px;
+        --radius-lg: 30px;
+        --radius-md: 20px;
+        --radius-sm: 12px;
+
+        --shadow-soft: 0 15px 35px rgba(0, 0, 0, 0.05);
+        --shadow-hover: 0 25px 50px rgba(0, 0, 0, 0.1);
+
+        /* 3D Card Shadows */
+        --3d-shadow: 0 15px 35px rgba(0, 0, 0, 0.04);
+        --3d-shadow-hover: 0 30px 60px rgba(213, 188, 164, 0.35);
+
+        --transition: all 0.6s cubic-bezier(0.23, 1, 0.32, 1);
+    }
+
+    body {
+        font-family: var(--font-sans);
+        background-color: var(--bg-white);
+        color: var(--text-dark);
+        margin: 0;
+        overflow-x: hidden;
+        background-image: url('https://www.transparenttextures.com/patterns/fabric-of-squares.png');
+    }
+
+    a, button { transition: var(--transition); cursor: pointer; text-decoration: none; }
+
+    /* ===================== HERO SECTION ===================== */
+    .hero-slider-container {
+        position: relative;
+        width: 100%;
+        height: 90vh;
+        min-height: 600px;
+        background-color: var(--bg-warm-grey);
+        overflow: hidden;
+    }
+
+    .hero-slide {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        opacity: 0;
+        visibility: hidden;
+        transition: opacity 1s ease-in-out, visibility 1s ease-in-out;
+        display: flex;
+        align-items: center;
+        padding: 0 8%;
+    }
+
+    .hero-slide.active {
+        opacity: 1;
+        visibility: visible;
+    }
+
+    .slide-bg {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        z-index: 0;
+        transform: scale(1.05);
+        transition: transform 6s linear;
+    }
+
+    .hero-slide.active .slide-bg {
+        transform: scale(1);
+    }
+
+    .hero-slide::after {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(90deg, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0.7) 40%, rgba(255,255,255,0) 100%);
+        z-index: 1;
+    }
+
+    .hero-content {
+        position: relative;
+        z-index: 2;
+        max-width: 600px;
+        transform: translateY(30px);
+        opacity: 0;
+        transition: all 1s ease 0.5s;
+    }
+
+    .hero-slide.active .hero-content {
+        transform: translateY(0);
+        opacity: 1;
+    }
+
+    .hero-badge {
+        font-family: var(--font-sans);
+        font-size: 13px;
+        text-transform: uppercase;
+        letter-spacing: 4px;
+        color: var(--text-muted);
+        margin-bottom: 20px;
+        display: block;
+        font-weight: 500;
+    }
+
+    .hero-title {
+        font-family: var(--font-serif);
+        font-size: 5.5rem;
+        font-weight: 700;
+        line-height: 1.05;
+        margin: 0 0 25px 0;
+        letter-spacing: -2px;
+        color: var(--text-dark);
+    }
+
+    .hero-desc {
+        font-size: 1.15rem;
+        color: var(--text-muted);
+        font-weight: 300;
+        line-height: 1.6;
+        margin-bottom: 40px;
+    }
+
+    .hero-btn {
+        background: var(--text-dark);
+        color: var(--bg-white);
+        padding: 18px 45px;
+        border-radius: 50px;
+        font-size: 14px;
+        letter-spacing: 1px;
+        display: inline-block;
+        border: 1px solid var(--text-dark);
+    }
+
+    .hero-btn:hover { background: transparent; color: var(--text-dark); }
+
+    .slider-indicators {
+        position: absolute;
+        bottom: 40px;
+        left: 8%;
+        z-index: 10;
+        display: flex;
+        gap: 12px;
+    }
+
+    .indicator {
+        width: 30px;
+        height: 3px;
+        background: rgba(0,0,0,0.2);
+        cursor: pointer;
+        transition: var(--transition);
+    }
+
+    .indicator.active {
+        background: var(--text-dark);
+        width: 50px;
+    }
+
+    /* ===================== EXISTING SECTIONS ===================== */
+    .section-header { text-align: center; margin-bottom: 80px; }
+    .section-header h2 { font-family: var(--font-serif); font-size: 3.5rem; margin: 0 0 15px; font-weight: 600; line-height: 1.1;}
+    .section-header p { color: var(--text-muted); font-size: 1.2rem; font-weight: 300; max-width: 600px; margin: 0 auto;}
+
+    /* Arrivals */
+    .arrivals-section { padding: 40px 5% 120px; background-color: var(--bg-offwhite); }
+    .editorial-prowess { display: grid; grid-template-columns: 2fr 1fr; gap: 40px; margin-top: 60px; }
+    .main-editorial { position: relative; background-color: var(--bg-dark-ochre); border-radius: var(--radius-lg); overflow: hidden; display: flex; align-items: center; padding: 60px; }
+    .main-editorial img { position: absolute; right: 0; bottom: 0; height: 120%; object-fit: contain; transform: translateX(20%); }
+    .editorial-content { position: relative; z-index: 2; max-width: 400px; }
+    .editorial-title { font-family: var(--font-serif); font-size: 3rem; color: #fff; margin: 0 0 20px; line-height: 1.1; }
+    .editorial-desc { color: rgba(255,255,255,0.8); margin-bottom: 30px; font-weight: 300; }
+    .editorial-btn { border: 1px solid #fff; color: #fff; padding: 12px 28px; border-radius: 50px; font-size: 13px; text-transform: uppercase; letter-spacing: 2px;}
+    .side-editorial-list { display: flex; flex-direction: column; gap: 20px; }
+    .side-item { background: var(--bg-white); border-radius: var(--radius-md); display: flex; padding: 20px; gap: 20px; align-items: center; }
+    .side-item-img { width: 100px; height: 100px; border-radius: var(--radius-sm); object-fit: cover; background: var(--bg-warm-grey); }
+    .side-item-content h4 { font-family: var(--font-serif); font-size: 1.4rem; margin: 0 0 5px; color: var(--text-dark); }
+    .side-item-content p { color: var(--text-muted); font-size: 0.9rem; font-weight: 300; margin: 0; }
+
+    /* Gallery */
+    .gallery-section { padding: 120px 5%; background-color: var(--bg-warm-grey); border-top: 1px solid rgba(0,0,0,0.03); }
+    .asymmetric-gallery { display: flex; flex-wrap: wrap; gap: 30px; justify-content: center; }
+    .gallery-item { position: relative; flex: 1 1 calc(25% - 30px); min-width: 280px; border-radius: var(--radius-lg); overflow: hidden; cursor: pointer; background: var(--bg-white); }
+    .gallery-item:nth-child(even) { border-top-left-radius: 100px; border-bottom-right-radius: 100px; }
+    .gallery-item:nth-child(3n+1) { border-top-right-radius: 80px; }
+    .gallery-item img { width: 100%; height: 100%; object-fit: cover; aspect-ratio: 4/5; transition: transform 1.2s ease; }
+    .gallery-item:hover img { transform: scale(1.08); }
+
+    .gallery-overlay {
+        position: absolute; inset: 0;
+        background: linear-gradient(to top, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0) 60%);
+        display: flex; flex-direction: column; justify-content: flex-end; padding: 40px;
+        transition: background 0.5s ease;
+    }
+
+    .gallery-item:hover .gallery-overlay {
+        background: linear-gradient(to top, rgba(255, 215, 0, 0.60) 0%, rgba(255, 215, 0, 0.15) 50%, rgba(255, 215, 0, 0) 100%);
+    }
+
+    .gallery-title { color: #fff; font-family: var(--font-serif); font-size: 2rem; margin: 0; line-height: 1.2; transition: transform 0.3s ease;}
+    .gallery-link { color: rgba(255,255,255,0.8); font-size: 13px; text-transform: uppercase; letter-spacing: 2px; margin-top: 10px; }
+    .gallery-item:hover .gallery-title { transform: translateY(-5px); }
+
+    /* Catalog & Filter Menu */
+    .catalog-section { padding: 120px 5%; background-color: var(--bg-white); }
+    .filter-menu { display: flex; justify-content: center; gap: 12px; margin-bottom: 60px; flex-wrap: wrap; }
+    .filter-btn { background: transparent; border: 1px solid rgba(0,0,0,0.1); color: var(--text-muted); padding: 14px 32px; border-radius: 50px; font-family: var(--font-sans); font-size: 14px; transition: var(--transition); }
+    .product-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 40px; }
+
+    /* ==========================================================================
+       IMPORTED SHOP 3D CARD STYLES
+       ========================================================================== */
+    .card-3d {
+        background: #ffffff; border-radius: 35px; padding: 15px; text-align: center;
+        box-shadow: var(--3d-shadow); transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1); cursor: pointer;
+        height: 100%; display: flex; flex-direction: column; position: relative; border: 1px solid #fff;
+    }
+    .card-3d:hover { transform: translateY(-15px); box-shadow: var(--3d-shadow-hover); }
+
+    .card-3d .img-wrapper { border-radius: 25px; overflow: hidden; aspect-ratio: 3/4; margin-bottom: 20px; position: relative; display: block; }
+    .card-3d img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.8s ease; }
+    .card-3d:hover img { transform: scale(1.1); }
+
+    /* Badges & Overlay Buttons */
+    .badge-new {
+        position: absolute; top: 15px; left: 15px; background: rgba(255,255,255,0.85); backdrop-filter: blur(5px);
+        padding: 5px 12px; border-radius: 50px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--text-dark); z-index: 2; box-shadow: 0 5px 10px rgba(0,0,0,0.05);
+    }
+    .wishlist-btn {
+        position: absolute; top: 15px; right: 15px; width: 35px; height: 35px; border-radius: 50%;
+        background: #fff; border: none; display: flex; align-items: center; justify-content: center;
+        color: var(--text-dark); z-index: 2; opacity: 0; transform: translateY(-10px); transition: 0.4s ease; box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+    .quick-add-btn {
+        position: absolute; bottom: 15px; left: 10%; right: 10%; width: 80%;
+        background: var(--text-dark); color: #fff; border: none; padding: 12px 0; border-radius: 50px;
+        font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; z-index: 2;
+        opacity: 0; transform: translateY(20px); transition: 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .card-3d:hover .wishlist-btn, .card-3d:hover .quick-add-btn { opacity: 1; transform: translateY(0); }
+    .wishlist-btn:hover { background: var(--bg-dark-ochre); color: #fff; }
+    .quick-add-btn:hover { background: var(--bg-dark-ochre); box-shadow: 0 10px 20px rgba(213, 188, 164, 0.4); }
+
+    .product-name {
+        font-family: var(--font-serif); font-weight: 700; font-size: 1.3rem; color: var(--text-dark); margin-bottom: 5px; text-decoration: none; display: block; letter-spacing: -0.5px;
+    }
+    .product-price { font-weight: 600; color: var(--bg-dark-ochre); font-size: 1.1rem; display: flex; justify-content: center; gap: 10px; align-items: center; }
+    .old-price { text-decoration: line-through; color: #bbb; font-size: 0.9rem; font-weight: 400; }
+    .card-body { padding: 0 10px 10px; display: flex; flex-direction: column; flex-grow: 1; justify-content: flex-end; }
+
+    /* ===================== DEAL OF THE WEEK SECTION ===================== */
+    .deal-showcase-section {
+        padding: 100px 5%;
+        background-color: var(--bg-warm-grey);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .deal-container {
+        max-width: 1300px;
+        margin: 0 auto;
+        position: relative;
+        display: flex;
+        align-items: center;
+    }
+
+    .deal-image-wrapper {
+        width: 65%;
+        height: 600px;
+        border-radius: var(--radius-xl);
+        overflow: hidden;
+        position: relative;
+        box-shadow: var(--shadow-soft);
+    }
+
+    .deal-image-wrapper img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 1.5s ease;
+    }
+
+    .deal-image-wrapper:hover img {
+        transform: scale(1.05);
+    }
+
+    .deal-content-card {
+        background: var(--bg-white);
+        padding: 60px 50px;
+        border-radius: var(--radius-xl);
+        width: 45%;
+        position: absolute;
+        right: 0;
+        top: 50%;
+        transform: translateY(-50%);
+        box-shadow: 0 30px 60px rgba(0,0,0,0.08);
+        border: 1px solid rgba(0,0,0,0.03);
+        z-index: 10;
+    }
+
+    .deal-badge {
+        font-family: var(--font-sans);
+        color: #d9534f;
+        text-transform: uppercase;
+        letter-spacing: 3px;
+        font-size: 11px;
+        font-weight: 600;
+        margin-bottom: 15px;
+        display: inline-block;
+        border-bottom: 2px solid #d9534f;
+        padding-bottom: 4px;
+    }
+
+    .deal-title {
+        font-family: var(--font-serif);
+        font-size: 3.5rem;
+        color: var(--text-dark);
+        margin: 0 0 15px;
+        line-height: 1.1;
+    }
+
+    .deal-desc {
+        color: var(--text-muted);
+        font-weight: 300;
+        line-height: 1.6;
+        margin-bottom: 25px;
+        font-size: 1.05rem;
+    }
+
+    .deal-price-wrapper {
+        display: flex;
+        align-items: baseline;
+        gap: 15px;
+        margin-bottom: 35px;
+    }
+
+    .deal-price-new {
+        font-family: var(--font-serif);
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: var(--text-dark);
+    }
+
+    .deal-price-old {
+        font-size: 1.2rem;
+        color: var(--text-light);
+        text-decoration: line-through;
+    }
+
+    .deal-timer {
+        display: flex;
+        gap: 15px;
+        margin-bottom: 40px;
+    }
+
+    .time-box {
+        background: var(--bg-offwhite);
+        border: 1px solid var(--bg-warm-grey);
+        border-radius: var(--radius-sm);
+        width: 70px;
+        height: 75px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.02);
+    }
+
+    .time-val {
+        font-family: var(--font-serif);
+        font-size: 1.8rem;
+        font-weight: 600;
+        color: var(--bg-dark-ochre);
+        line-height: 1;
+    }
+
+    .time-label {
+        font-size: 10px;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        color: var(--text-muted);
+        margin-top: 5px;
+    }
+
+    .deal-btn-main {
+        background: var(--text-dark);
+        color: var(--bg-white);
+        padding: 18px 40px;
+        border-radius: 50px;
+        font-size: 13px;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        display: inline-block;
+        width: 100%;
+        text-align: center;
+        transition: var(--transition);
+        border: 1px solid var(--text-dark);
+    }
+
+    /* Sage */
+    .sage-showcase { padding: 120px 5%; background-color: var(--bg-offwhite); position: relative; overflow: hidden;}
+    .sage-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: center; }
+    .sage-image-wall { display: flex; flex-direction: column; gap: 30px; }
+    .sage-stack { display: flex; gap: 30px; }
+    .sage-stack img { width: calc(50% - 15px); aspect-ratio: 1/1; object-fit: cover; border-radius: var(--radius-md); }
+    .sage-main-product { position: relative; aspect-ratio: 5/4; overflow: hidden; border-radius: var(--radius-lg); }
+    .sage-main-product img { width: 100%; height: 100%; object-fit: cover; }
+    .sage-overlay { position: absolute; bottom: 0; left: 0; padding: 40px; }
+    .sage-overlay h3 { font-family: var(--font-serif); font-size: 2.2rem; color: var(--text-dark); margin: 0 0 10px; }
+    .sage-overlay p { color: var(--text-muted); margin: 0; font-weight: 300; }
+    .sage-content-column { position: relative; display: flex; flex-direction: column; }
+    .sage-text-huge { font-family: var(--font-serif); font-size: 15vw; color: rgba(18,18,18,0.03); line-height: 0.8; position: absolute; top: 0; left: 0; transform: translateY(-50%); z-index: 1; }
+    .sage-description-box { position: relative; z-index: 2; padding-top: 8vw; max-width: 500px; }
+    .sage-description-box h2 { font-family: var(--font-serif); font-size: 3rem; margin: 0 0 25px; line-height: 1.1; }
+    .sage-description-box p { color: var(--text-muted); font-size: 1.1rem; line-height: 1.6; font-weight: 300; margin-bottom: 40px; }
+    .sage-btn { background: var(--text-dark); color: #fff; padding: 18px 45px; border-radius: 50px; font-size: 14px;}
+
+    /* Benefits */
+    .benefits-section { padding: 100px 5%; background-color: var(--bg-white); border-top: 1px solid rgba(0,0,0,0.03); }
+    .benefits-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 40px; text-align: center; }
+    .benefit-item { background: var(--bg-offwhite); padding: 50px 30px; border-radius: var(--radius-md); border: 1px solid transparent; transition: var(--transition); }
+    .benefit-item:hover { border-color: var(--bg-warm-grey); box-shadow: var(--shadow-soft); }
+    .benefit-item i { font-size: 2.5rem; color: var(--bg-dark-ochre); margin-bottom: 30px; }
+    .benefit-item h5 { font-family: var(--font-sans); font-weight: 600; font-size: 1.2rem; margin-bottom: 10px; }
+    .benefit-item p { color: var(--text-muted); font-size: 0.95rem; font-weight: 300; margin: 0;}
+
+    /* Dark Background Typo Banner */
+    .typo-banner {
+        padding: 80px 5%;
+        background-image: linear-gradient(rgba(253, 250, 247, 0.9), rgba(213, 188, 164, 0.95)), url('https://images.unsplash.com/photo-1441986300917-64674bd600d8?q=80&w=1920&auto=format&fit=crop');
+        background-size: cover;
+        background-position: center;
+        background-attachment: fixed;
+        text-align: center;
+        overflow: hidden;
+        position: relative;
+    }
+    .huge-text {
+        font-family: var(--font-serif);
+        font-size: 7vw;
+        color: var(--text-dark);
+        line-height: 1;
+        letter-spacing: -2px;
+        margin: 0;
+        position: relative;
+        z-index: 2;
+        font-weight: 700;
+    }
+    .typo-sub {
+        font-family: var(--font-sans);
+        font-size: 1.1rem;
+        color: rgba(18, 18, 18, 0.7);
+        margin-top: 15px;
+        letter-spacing: 3px;
+        text-transform: uppercase;
+        position: relative;
+        z-index: 2;
+        font-weight: 500;
+    }
+
+    /* ===================== RESPONSIVE ===================== */
+    @media (max-width: 1200px) { .product-grid { grid-template-columns: repeat(3, 1fr); } }
+    @media (max-width: 1024px) {
+        .hero-title { font-size: 4rem; } .editorial-prowess, .sage-layout { grid-template-columns: 1fr; }
+        .product-grid, .asymmetric-gallery, .benefits-grid { grid-template-columns: repeat(2, 1fr); display: flex; flex-wrap: wrap; justify-content: center; }
+        .gallery-item { flex: 1 1 calc(50% - 30px); } .benefit-item { flex: 1 1 calc(50% - 40px); }
+        .instagram-grid { grid-template-columns: repeat(2, 1fr); }
+
+        .deal-container { flex-direction: column; }
+        .deal-image-wrapper { width: 100%; height: 500px; border-radius: var(--radius-lg); }
+        .deal-content-card { width: 90%; position: relative; right: auto; top: -80px; transform: none; margin: 0 auto; padding: 40px 30px; text-align: center; }
+        .deal-timer { justify-content: center; }
+        .deal-price-wrapper { justify-content: center; }
+    }
+    @media (max-width: 768px) {
+        .hero-title { font-size: 3rem; } .hero-slide::after { background: rgba(255,255,255,0.85); }
+        .section-header h2 { font-size: 2.5rem; } .product-grid { grid-template-columns: 1fr; display: flex; flex-direction: column; align-items: center; }
+        .card-3d { width: 100%; max-width: 400px; } .asymmetric-gallery { flex-direction: column; }
+        .gallery-item { border-radius: var(--radius-md) !important; aspect-ratio: 1/1;} .benefit-item { flex: 1 1 100%; }
+        .sage-description-box h2 { font-size: 2.2rem; } .ns-title { font-size: 2.2rem; } .ns-form { flex-direction: column; } .ns-btn { width: 100%; }
+    }
+    @media (max-width: 576px) {
+        .deal-title { font-size: 2.5rem; }
+        .time-box { width: 60px; height: 65px; }
+        .time-val { font-size: 1.5rem; }
+    }
+
+    /* YELLOW BUTTON HOVER EFFECTS */
+    .hero-btn:hover,
+    .editorial-btn:hover,
+    .deal-btn-main:hover,
+    .sage-btn:hover,
+    .ns-btn:hover {
+        background-color: #FFD700 !important;
+        color: #121212 !important;
+        border-color: #FFD700 !important;
+    }
+
+    .action-btn:hover {
+        background-color: #FFD700 !important;
+        color: #121212 !important;
+        border-color: #FFD700 !important;
+    }
+
+    .filter-btn:hover, .filter-btn.active {
+        background-color: #FFD700 !important;
+        color: #121212 !important;
+        border-color: #FFD700 !important;
+    }
+
+</style>
+
+<div class="hero-slider-container">
+    <div class="hero-slide active">
+        <img src="https://images.unsplash.com/photo-1490481651871-ab68de25d43d?q=80&w=1920&auto=format&fit=crop" alt="Fashion" class="slide-bg">
+        <div class="hero-content">
+            <span class="hero-badge">Curated Excellence</span>
+            <h1 class="hero-title">Spring <br>Collection.</h1>
+            <p class="hero-desc">Discover our wide ranging and timeless lifestyle products. Pick your favorite stuff that matches your personal taste.</p>
+            <a href="/shop" class="hero-btn">Start Shopping</a>
+        </div>
+    </div>
+    <div class="hero-slide">
+        <img src="https://images.unsplash.com/photo-1615529182904-14819c35db37?q=80&w=1920&auto=format&fit=crop" alt="Decor" class="slide-bg">
+        <div class="hero-content">
+            <span class="hero-badge">Modern Living</span>
+            <h1 class="hero-title">Urban <br>Elegance.</h1>
+            <p class="hero-desc">Elevate your everyday experiences with our handpicked home decor and exquisite aesthetic pieces.</p>
+            <a href="/shop" class="hero-btn">Explore Decor</a>
+        </div>
+    </div>
+    <div class="hero-slide">
+        <img src="https://images.unsplash.com/photo-1441984904996-e0b6ba687e04?q=80&w=1920&auto=format&fit=crop" alt="Accessories" class="slide-bg">
+        <div class="hero-content">
+            <span class="hero-badge">New Arrivals 2026</span>
+            <h1 class="hero-title">The Art <br>of Detail.</h1>
+            <p class="hero-desc">Small additions that make a massive difference. Browse the latest premium accessories and smart tech.</p>
+            <a href="/shop" class="hero-btn">View Accessories</a>
+        </div>
+    </div>
+    <div class="slider-indicators">
+        <div class="indicator active" onclick="goToSlide(0)"></div>
+        <div class="indicator" onclick="goToSlide(1)"></div>
+        <div class="indicator" onclick="goToSlide(2)"></div>
+    </div>
+</div>
+
+<section class="arrivals-section">
+    <div class="section-header">
+        <h2>Fresh Fashion at Modern Vibes</h2>
+        <p>Our collection is constantly updated with the latest styles, ensuring you're always on point.</p>
+    </div>
+    <div class="editorial-prowess">
+
+        <div class="main-editorial" style="background-color: #1a1a1a; padding: 60px;">
+            <img src="{% static 'img/T-shirt poster design.jpg' %}" alt="Premium T-Shirt" style="width: 100%; height: 100%; object-fit: cover; opacity: 0.6; right: 0; transform: none;">
+            <div class="editorial-content">
+                <h3 class="editorial-title">Elevated Style.</h3>
+                <p class="editorial-desc" style="color: #fff;">Discover our new premium cotton t-shirt collection. Feel comfy and trendy every single day.</p>
+                <a href="/shop" class="editorial-btn">Order Now <i class="fa-solid fa-arrow-right-long ms-2"></i></a>
+            </div>
+        </div>
+        <div class="side-editorial-list">
+            <div class="side-item">
+                <img src="https://images.unsplash.com/photo-1616486338812-3dadae4b4ace?q=80&w=400&auto=format&fit=crop" alt="Home Decor" class="side-item-img">
+                <div class="side-item-content">
+                    <h4>Urban Accents.</h4>
+                    <p>Elevate your living spaces with handpicked decor.</p>
+                </div>
+            </div>
+            <div class="side-item">
+                <img src="https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?q=80&w=400&auto=format&fit=crop" alt="Accessories" class="side-item-img">
+                <div class="side-item-content">
+                    <h4>The Accessories.</h4>
+                    <p>Small details that make a massive difference.</p>
+                </div>
+            </div>
+            <div class="side-item">
+                <img src="https://images.unsplash.com/photo-1549298916-b41d501d3772?q=80&w=400&auto=format&fit=crop" alt="Premium Shoes" class="side-item-img">
+                <div class="side-item-content">
+                    <h4>Premium Footwear.</h4>
+                    <p>Steps to defining your unique look.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="gallery-section">
+    <div class="section-header">
+        <h2>Explore The Refinement.</h2>
+        <p>A journey through textures and shapes curated for the discerning taste.</p>
+    </div>
+<div class="asymmetric-gallery">
+
+       <div class="gallery-item" onclick="window.location.href='/shop?category=clothes'">
+            <img src="{% static 'img/T-shirt social media post  design.jpg' %}" alt="Fashion Editorial">
+            <div class="gallery-overlay">
+                <h3 class="gallery-title">Premium <br>Clothes</h3>
+                <span class="gallery-link">Explore Collection</span>
+            </div>
+        </div>
+
+        <div class="gallery-item" onclick="window.location.href='/shop?category=Electronics'">
+            <img src="{% static 'img/headphone.jpg' %}" alt="Electronics">
+            <div class="gallery-overlay">
+                <h3 class="gallery-title">Smart <br>Electronics</h3>
+                <span class="gallery-link">View Gadgets</span>
+            </div>
+        </div>
+
+        <div class="gallery-item" onclick="window.location.href='/shop?category=home decorate'">
+            <img src="{% static 'img/homedecor.jpg' %}" alt="Home Decor">
+            <div class="gallery-overlay">
+                <h3 class="gallery-title">Elegant <br>Sanctuaries</h3>
+                <span class="gallery-link">Decor Your Home</span>
+            </div>
+        </div>
+
+        <div class="gallery-item" onclick="window.location.href='/shop?category=Accessories'">
+            <img src="{% static 'img/necklesh.jpg' %}" alt="Accessories">
+            <div class="gallery-overlay">
+                <h3 class="gallery-title">Handcrafted <br>Accents</h3>
+                <span class="gallery-link">Shop Accessories</span>
+            </div>
+        </div>
+
+    </div>
+</section>
+
+<section class="catalog-section">
+    <div class="section-header">
+        <h2>Browse All You Need.</h2>
+    </div>
+
+    <div class="filter-menu">
+        <button class="filter-btn active" data-filter="all">View All</button>
+
+        <button class="filter-btn" data-filter="clothes">Clothes</button>
+        <button class="filter-btn" data-filter="footwear">Footwear</button>
+        <button class="filter-btn" data-filter="accessories">Accessories</button>
+        <button class="filter-btn" data-filter="electronics">Electronics</button>
+        <button class="filter-btn" data-filter="home decorate">Home Decor</button>
+    </div>
+
+    <div class="product-grid">
+        {% for i in product|slice:":8" %}
+            <div class="card-3d prod-card" data-category="{{ i.category.name|lower }}">
+                <div class="img-wrapper">
+                    <span class="badge-new">New</span>
+                    <a href="/add_to_wishlist/{{ i.id }}" class="wishlist-btn"><i class="fa fa-heart-o"></i></a>
+
+                    <a href="/singleproduct/{{ i.id }}">
+                        <img src="/media/{{ i.image }}" alt="{{ i.name }}">
+                    </a>
+
+                    <form action="/insertintocart/" method="post" style="margin: 0;">
+                        {% csrf_token %}
+                        <input type="hidden" name="productid" value="{{ i.id }}">
+                        <input type="hidden" name="price" value="{{ i.price }}">
+                        <input type="hidden" name="quantity" value="1">
+                        <button type="submit" class="quick-add-btn">Quick Add <i class="fa fa-plus ms-1"></i></button>
+                    </form>
+                </div>
+
+                <div class="card-body">
+                    <a href="/singleproduct/{{ i.id }}" class="product-name">{{ i.name }}</a>
+                    <div class="product-price">
+                        ₹ {{ i.price }}
+                        <span class="old-price">₹ {{ i.price|add:"500" }}</span>
+                    </div>
+                </div>
+            </div>
+
+        {% empty %}
+            <div class="card-3d prod-card" data-category="outerwear">
+                <div class="img-wrapper">
+                    <span class="badge-new">New</span>
+                    <a href="#" class="wishlist-btn"><i class="fa fa-heart-o"></i></a>
+                    <a href="#">
+                        <img src="https://images.unsplash.com/photo-1591047139829-d91aecb6caea?q=80&w=600&auto=format&fit=crop" alt="Jacket">
+                    </a>
+                    <button type="button" class="quick-add-btn">Quick Add <i class="fa fa-plus ms-1"></i></button>
+                </div>
+                <div class="card-body">
+                    <a href="#" class="product-name">Japan Green Outer</a>
+                    <div class="product-price">
+                        ₹ 3,999
+                        <span class="old-price">₹ 4,499</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card-3d prod-card" data-category="tops">
+                <div class="img-wrapper">
+                    <span class="badge-new">New</span>
+                    <a href="#" class="wishlist-btn"><i class="fa fa-heart-o"></i></a>
+                    <a href="#">
+                        <img src="https://images.unsplash.com/photo-1583743814966-8936f5b7be1a?q=80&w=600&auto=format&fit=crop" alt="Tee">
+                    </a>
+                    <button type="button" class="quick-add-btn">Quick Add <i class="fa fa-plus ms-1"></i></button>
+                </div>
+                <div class="card-body">
+                    <a href="#" class="product-name">Black to Basic Tee</a>
+                    <div class="product-price">
+                        ₹ 1,500
+                        <span class="old-price">₹ 2,000</span>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+
+    <div class="text-center mt-5">
+        <a href="/shop" class="hero-btn" style="border-radius: 50px;">Explore Entire Catalog</a>
+    </div>
+</section>
+
+<section class="deal-showcase-section">
+    <div class="deal-container">
+        <div class="deal-image-wrapper">
+            <img src="{% static 'img/regen-jacket.jpg' %}" alt="Regen Jacket Deal">
+        </div>
+
+        <div class="deal-content-card">
+            <span class="deal-badge">Flash Sale</span>
+            <h2 class="deal-title">Deal Of The Week</h2>
+            <p class="deal-desc">Trendy and comfortable. Grab this exclusive Regen Jacket before the timer runs out. Limited stock available with free shipping!</p>
+
+            <div class="deal-price-wrapper">
+                <span class="deal-price-new">₹ 1,499</span>
+                <span class="deal-price-old">₹ 3,999</span>
+                <span style="color: #d9534f; font-size: 13px; font-weight: 600;">(50% OFF)</span>
+            </div>
+
+            <div class="deal-timer" id="flash-sale-timer">
+                <div class="time-box">
+                    <span class="time-val" id="timer-days">00</span>
+                    <span class="time-label">Days</span>
+                </div>
+                <div class="time-box">
+                    <span class="time-val" id="timer-hours">00</span>
+                    <span class="time-label">Hrs</span>
+                </div>
+                <div class="time-box">
+                    <span class="time-val" id="timer-mins">00</span>
+                    <span class="time-label">Mins</span>
+                </div>
+                <div class="time-box">
+                    <span class="time-val" id="timer-secs">00</span>
+                    <span class="time-label">Secs</span>
+                </div>
+            </div>
+
+            <a href="/shop" class="deal-btn-main">Shop The Deal Now</a>
+        </div>
+    </div>
+</section>
+
+<section class="sage-showcase">
+    <div class="sage-layout">
+        <div class="sage-image-wall">
+
+            <div class="sage-main-product">
+                <img src="{% static 'img/necklesh.jpg' %}" alt="All in One skincare">
+                <div class="sage-overlay">
+                    <h3>Pure care by nature</h3>
+                    <p>Thoughtfully crafted formulas designed to bring balance.</p>
+                </div>
+            </div>
+        </div>
+        <div class="sage-content-column">
+            <div class="sage-text-huge">new</div>
+            <div class="sage-description-box">
+                <h2>All-in-One Essence Complex.</h2>
+                <p>Sage is about conscious simplicity — effective formulas, thoughtful ingredients, and soft textures designed for real everyday life. We believe skincare should support your skin, not overwhelm it, combining modern science with a calm, minimal approach.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="benefits-section">
+    <div class="benefits-grid">
+        <div class="benefit-item">
+            <i class="fa-solid fa-truck-fast"></i>
+            <h5>Free Shipping</h5>
+            <p>On all orders over ₹1999</p>
+        </div>
+        <div class="benefit-item">
+            <i class="fa-solid fa-arrows-rotate"></i>
+            <h5>Easy Returns</h5>
+            <p>14-day hassle-free returns</p>
+        </div>
+        <div class="benefit-item">
+            <i class="fa-solid fa-shield-halved"></i>
+            <h5>Secure Checkout</h5>
+            <p>100% protected payments</p>
+        </div>
+        <div class="benefit-item">
+            <i class="fa-solid fa-comments"></i>
+            <h5>Expert Support</h5>
+            <p>Dedicated customer care</p>
+        </div>
+    </div>
+</section>
+
+<section class="typo-banner">
+    <h2 class="huge-text">townkart.</h2>
+    <p class="typo-sub">Curation for Exceptional Living</p>
+</section>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        // --- Hero Slider Script ---
+        let currentSlide = 0;
+        const slides = document.querySelectorAll('.hero-slide');
+        const indicators = document.querySelectorAll('.indicator');
+        const slideCount = slides.length;
+        let slideInterval;
+
+        function showSlide(index) {
+            slides.forEach(slide => slide.classList.remove('active'));
+            indicators.forEach(ind => ind.classList.remove('active'));
+            slides[index].classList.add('active');
+            indicators[index].classList.add('active');
+            currentSlide = index;
+        }
+
+        function nextSlide() {
+            let nextIndex = (currentSlide + 1) % slideCount;
+            showSlide(nextIndex);
+        }
+
+        function startSlider() {
+            slideInterval = setInterval(nextSlide, 3500);
+        }
+
+        window.goToSlide = function(index) {
+            clearInterval(slideInterval);
+            showSlide(index);
+            startSlider();
+        };
+
+        startSlider();
+
+        // --- NEW Product Filtering Script ---
+        const filterBtns = document.querySelectorAll('.filter-btn');
+        const productCards = document.querySelectorAll('.prod-card');
+
+        filterBtns.forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                e.preventDefault();
+
+                // 1. Change the active yellow button
+                filterBtns.forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+
+                // 2. Get the category we want to filter by
+                const filterValue = this.getAttribute('data-filter').toLowerCase();
+
+                // 3. Loop through all products and hide/show them
+                productCards.forEach(card => {
+                    const cardCategory = card.getAttribute('data-category') ? card.getAttribute('data-category').toLowerCase() : '';
+
+                    if (filterValue === 'all' || cardCategory.includes(filterValue)) {
+                        card.style.display = 'block'; // Show the card
+                    } else {
+                        card.style.display = 'none';  // Hide the card
+                    }
+                });
+            });
+        });
+
+        // --- Deal of the Week Timer Script ---
+        let countDownDate = new Date().getTime() + (5 * 24 * 60 * 60 * 1000);
+
+        let x = setInterval(function() {
+            let now = new Date().getTime();
+            let distance = countDownDate - now;
+
+            let days = Math.floor(distance / (1000 * 60 * 60 * 24));
+            let hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            let minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+            let seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+            days = days < 10 ? "0" + days : days;
+            hours = hours < 10 ? "0" + hours : hours;
+            minutes = minutes < 10 ? "0" + minutes : minutes;
+            seconds = seconds < 10 ? "0" + seconds : seconds;
+
+            document.getElementById("timer-days").innerHTML = days;
+            document.getElementById("timer-hours").innerHTML = hours;
+            document.getElementById("timer-mins").innerHTML = minutes;
+            document.getElementById("timer-secs").innerHTML = seconds;
+
+            if (distance < 0) {
+                clearInterval(x);
+                document.getElementById("flash-sale-timer").innerHTML = "<div style='font-family:var(--font-serif); font-size:1.5rem; color:#d9534f;'>Deal Expired</div>";
+            }
+        }, 1000);
+    });
+</script>
+
+{% endblock %}

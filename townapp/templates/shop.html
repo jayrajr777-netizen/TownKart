@@ -1,0 +1,366 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block main %}
+
+<style>
+    /* Ultra-Premium Editorial & 3D Styling */
+    :root {
+        --bg-blush: #fdfbfb;
+        --bg-sand: #dcbfae;
+        --bg-sand-dark: #c4a491;
+        --text-dark: #1a1a1a;
+        --text-muted: #888888;
+        --3d-shadow: 0 15px 35px rgba(0, 0, 0, 0.04);
+        --3d-shadow-hover: 0 30px 60px rgba(220, 191, 174, 0.35);
+    }
+
+    body {
+        background-color: var(--bg-blush);
+        font-family: 'Jost', sans-serif;
+        overflow-x: hidden;
+        position: relative;
+    }
+
+    /* Ambient Background Blobs */
+    @keyframes floatBlob {
+        0% { transform: translate(0, 0) scale(1); }
+        33% { transform: translate(40px, -60px) scale(1.1); }
+        66% { transform: translate(-30px, 30px) scale(0.9); }
+        100% { transform: translate(0, 0) scale(1); }
+    }
+    .bg-blob {
+        position: absolute; filter: blur(90px); border-radius: 50%; z-index: -1; opacity: 0.4; animation: floatBlob 15s infinite ease-in-out;
+    }
+    .blob-1 { width: 450px; height: 450px; background: var(--bg-sand); top: 5%; left: -5%; }
+    .blob-2 { width: 350px; height: 350px; background: #e0d4cc; bottom: 10%; right: -5%; animation-delay: -5s; }
+
+    /* Animations */
+    @keyframes fadeUp {
+        0% { opacity: 0; transform: translateY(40px); }
+        100% { opacity: 1; transform: translateY(0); }
+    }
+    .animate-up { opacity: 0; animation: fadeUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+    .delay-1 { animation-delay: 0.1s; }
+    .delay-2 { animation-delay: 0.2s; }
+
+    /* 1. Glassmorphism Breadcrumb */
+    .breadcrumb-3d {
+        background: rgba(255, 255, 255, 0.7);
+        backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+        border-radius: 50px; padding: 15px 35px;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.03), inset 0 0 0 1px rgba(255,255,255,0.9);
+        display: inline-block; margin: 40px 0; font-weight: 500; font-size: 14px;
+    }
+    .breadcrumb-3d a { color: var(--text-dark); margin-right: 12px; text-decoration: none; transition: 0.3s;}
+    .breadcrumb-3d a:hover { color: var(--bg-sand-dark); }
+    .breadcrumb-3d span { color: var(--text-muted); }
+
+    /* 2. Glass Sidebar */
+    .glass-sidebar {
+        background: rgba(255, 255, 255, 0.8);
+        backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px);
+        border-radius: 40px; padding: 40px 35px;
+        box-shadow: 0 20px 50px rgba(0,0,0,0.05), inset 0 0 0 1px rgba(255,255,255,1);
+        margin-bottom: 40px; position: sticky; top: 30px;
+    }
+    .filter-widget { margin-bottom: 35px; }
+    .fw-title {
+        font-family: 'Playfair Display', serif; font-size: 1.4rem; font-weight: 700; color: var(--text-dark);
+        margin-bottom: 25px; padding-bottom: 15px; border-bottom: 1px solid rgba(0,0,0,0.05);
+    }
+
+    /* --- NEW PREMIUM CATEGORY LIST STYLING --- */
+    .premium-category-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+    }
+    .premium-category-list li a {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 12px 20px;
+        background: rgba(255, 255, 255, 0.5);
+        border: 1px solid rgba(255, 255, 255, 0.9);
+        border-radius: 18px;
+        text-decoration: none;
+        color: var(--text-dark);
+        font-weight: 600;
+        font-size: 14px;
+        transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        box-shadow: 0 4px 10px rgba(0,0,0,0.01);
+    }
+    .premium-category-list li a:hover {
+        background: #ffffff;
+        transform: translateY(-4px) scale(1.02);
+        box-shadow: 0 12px 25px rgba(220, 191, 174, 0.25);
+        border-color: var(--bg-sand-dark);
+        color: var(--bg-sand-dark);
+    }
+    .premium-category-list .cat-badge {
+        background: var(--bg-blush);
+        color: var(--text-muted);
+        font-size: 11px;
+        font-weight: 700;
+        padding: 4px 10px;
+        border-radius: 30px;
+        transition: all 0.4s ease;
+    }
+    .premium-category-list li a:hover .cat-badge {
+        background: var(--bg-sand-dark);
+        color: #fff;
+        transform: scale(1.1);
+    }
+
+    /* Visual Color Swatches */
+    .fw-color-choose { display: flex; flex-wrap: wrap; gap: 10px; }
+    .color-swatch { width: 30px; height: 30px; border-radius: 50%; cursor: pointer; border: 2px solid #fff; box-shadow: 0 5px 10px rgba(0,0,0,0.1); transition: 0.3s; }
+    .color-swatch:hover { transform: scale(1.2); box-shadow: 0 8px 15px rgba(0,0,0,0.15); }
+
+    /* 3. Shop Top Bar */
+    .product-show-option {
+        background: rgba(255, 255, 255, 0.6); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
+        border-radius: 30px; padding: 15px 30px; margin-bottom: 30px;
+        display: flex; justify-content: space-between; align-items: center; box-shadow: 0 10px 20px rgba(0,0,0,0.02);
+    }
+    .sorting { border: none; background: #fff; padding: 8px 20px; border-radius: 50px; font-weight: 600; color: var(--text-dark); outline: none; cursor: pointer; box-shadow: 0 5px 10px rgba(0,0,0,0.03); }
+
+    /* 4. Ultra-Attractive Product Cards */
+    .card-3d {
+        background: #ffffff; border-radius: 35px; padding: 15px; text-align: center;
+        box-shadow: var(--3d-shadow); transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1); cursor: pointer;
+        height: 100%; display: flex; flex-direction: column; position: relative; border: 1px solid #fff;
+    }
+    .card-3d:hover { transform: translateY(-15px); box-shadow: var(--3d-shadow-hover); }
+
+    .card-3d .img-wrapper { border-radius: 25px; overflow: hidden; aspect-ratio: 3/4; margin-bottom: 20px; position: relative; }
+    .card-3d img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.8s ease; }
+    .card-3d:hover img { transform: scale(1.1); }
+
+    /* Badges & Overlay Buttons */
+    .badge-new {
+        position: absolute; top: 15px; left: 15px; background: rgba(255,255,255,0.85); backdrop-filter: blur(5px);
+        padding: 5px 12px; border-radius: 50px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--text-dark); z-index: 2; box-shadow: 0 5px 10px rgba(0,0,0,0.05);
+    }
+    .wishlist-btn {
+        position: absolute; top: 15px; right: 15px; width: 35px; height: 35px; border-radius: 50%;
+        background: #fff; border: none; display: flex; align-items: center; justify-content: center;
+        color: var(--text-dark); z-index: 2; opacity: 0; transform: translateY(-10px); transition: 0.4s ease; box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+    .quick-add-btn {
+        position: absolute; bottom: 15px; left: 10%; right: 10%; width: 80%;
+        background: var(--text-dark); color: #fff; border: none; padding: 12px 0; border-radius: 50px;
+        font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; z-index: 2;
+        opacity: 0; transform: translateY(20px); transition: 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .card-3d:hover .wishlist-btn, .card-3d:hover .quick-add-btn { opacity: 1; transform: translateY(0); }
+    .wishlist-btn:hover { background: var(--bg-sand-dark); color: #fff; }
+    .quick-add-btn:hover { background: var(--bg-sand-dark); box-shadow: 0 10px 20px rgba(220, 191, 174, 0.4); }
+
+    .product-name {
+        font-family: 'Playfair Display', serif; font-weight: 700; font-size: 1.3rem; color: var(--text-dark); margin-bottom: 5px; text-decoration: none; display: block; letter-spacing: -0.5px;
+    }
+    .product-price { font-weight: 600; color: var(--bg-sand-dark); font-size: 1.1rem; display: flex; justify-content: center; gap: 10px; align-items: center; }
+    .old-price { text-decoration: line-through; color: #bbb; font-size: 0.9rem; font-weight: 400; }
+    .card-body { padding: 0 10px 10px; display: flex; flex-direction: column; flex-grow: 1; justify-content: flex-end; }
+
+    /* 5. Pagination */
+    .pagination-glass { display: flex; justify-content: center; gap: 12px; margin-top: 40px; }
+    .pagination-glass a {
+        width: 45px; height: 45px; display: flex; align-items: center; justify-content: center;
+        background: rgba(255,255,255,0.6); backdrop-filter: blur(10px); border-radius: 50%;
+        color: var(--text-dark); font-weight: 600; text-decoration: none; transition: 0.3s; box-shadow: 0 5px 15px rgba(0,0,0,0.03); border: 1px solid rgba(255,255,255,0.9);
+    }
+    .pagination-glass a:hover, .pagination-glass a.active {
+        background: var(--text-dark); color: #fff; transform: translateY(-5px); box-shadow: 0 10px 20px rgba(0,0,0,0.15);
+    }
+</style>
+
+<div class="bg-blob blob-1"></div>
+<div class="bg-blob blob-2"></div>
+
+<div class="container animate-up">
+    <div class="breadcrumb-3d">
+        <a href="/"><i class="fa fa-home"></i> Home</a> &rsaquo;
+        <span>Shop Collection</span>
+    </div>
+</div>
+
+<section class="product-shop spad mb-5">
+    <div class="container">
+        <div class="row">
+
+            <div class="col-lg-3 col-md-4 order-2 order-lg-1 animate-up delay-1">
+                <div class="glass-sidebar">
+
+                    <div class="filter-widget">
+                        <h4 class="fw-title">Categories</h4>
+                        <ul class="premium-category-list">
+                            <li>
+                                <a href="{{ request.path }}">
+                                    <span class="cat-name"><i class="fa fa-th-large me-2" style="opacity: 0.5;"></i> All Products</span>
+                                </a>
+                            </li>
+
+                            {% for cat in categories %}
+                            <li>
+                                <a href="?category={{ cat.id }}">
+                                    <span class="cat-name">{{ cat.name }}</span>
+                                    <span class="cat-badge">{{ cat.product_set.count }}</span>
+                                </a>
+                            </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+<!--                    <div class="filter-widget">-->
+<!--                        <h4 class="fw-title">Colors</h4>-->
+<!--                        <div class="fw-color-choose">-->
+<!--                            <span class="color-swatch" style="background-color: #1a1a1a;" title="Black"></span>-->
+<!--                            <span class="color-swatch" style="background-color: #f5f5dc;" title="Beige"></span>-->
+<!--                            <span class="color-swatch" style="background-color: #8da399;" title="Sage"></span>-->
+<!--                            <span class="color-swatch" style="background-color: #a85a5a;" title="Rust"></span>-->
+<!--                            <span class="color-swatch" style="background-color: #e6e6fa;" title="Lavender"></span>-->
+<!--                        </div>-->
+<!--                    </div>-->
+
+<!--                    <div class="filter-widget">-->
+<!--                        <h4 class="fw-title">Trending Tags</h4>-->
+<!--                        <div class="fw-tags">-->
+<!--                            <a href="#">Streetwear</a>-->
+<!--                            <a href="#">Minimalist</a>-->
+<!--                            <a href="#">Outerwear</a>-->
+<!--                            <a href="#">Accessories</a>-->
+<!--                        </div>-->
+<!--                    </div>-->
+                </div>
+            </div>
+
+            <div class="col-lg-9 col-md-8 order-1 order-lg-2 animate-up delay-2">
+
+                <!-- =========== નવું સર્ચ બાર અહી ઉમેરો =========== -->
+    <form action="/shop" method="GET">
+        <div style="background: rgba(255, 255, 255, 0.6); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); border-radius: 30px; padding: 10px 20px; margin-bottom: 25px; display: flex; gap: 10px; box-shadow: 0 10px 20px rgba(0,0,0,0.02); border: 1px solid rgba(255,255,255,0.9); align-items: center;">
+
+            <!-- પ્રોડક્ટ સર્ચ -->
+            <i class="fa fa-search" style="color: var(--text-muted); margin-left: 10px;"></i>
+            <input type="text" name="query" placeholder="Search product..." value="{{ search_query|default_if_none:'' }}" style="border: none; background: transparent; outline: none; flex: 1; padding: 5px 10px; color: var(--text-dark); font-weight: 500;">
+
+            <div style="width: 1px; height: 25px; background: rgba(0,0,0,0.1); margin: 0 5px;"></div>
+
+            <!-- લોકેશન સર્ચ -->
+            <i class="fa fa-map-marker" style="color: var(--text-muted);"></i>
+            <input type="text" name="location" placeholder="Area / Location..." value="{{ location_query|default_if_none:'' }}" style="border: none; background: transparent; outline: none; flex: 1; padding: 5px 10px; color: var(--text-dark); font-weight: 500;">
+
+            <!-- સર્ચ બટન -->
+            <button type="submit" style="background: var(--text-dark); color: #fff; border: none; padding: 10px 30px; border-radius: 50px; font-weight: 600; cursor: pointer; transition: 0.3s; box-shadow: 0 5px 15px rgba(0,0,0,0.1);">
+                Find
+            </button>
+
+        </div>
+    </form>
+    <!-- ============================================== -->
+
+                <div class="product-show-option">
+                    <div>
+                        <select class="sorting me-3">
+                            <option value="">Sort by: Trending</option>
+                            <option value="">New Arrivals</option>
+                            <option value="">Price: Low to High</option>
+                        </select>
+                    </div>
+                    <div>
+                        <p class="mb-0 text-muted" style="font-size: 14px; font-weight: 500;">Showing {{ product|length }} Premium Products</p>
+                    </div>
+                </div>
+
+                <div class="row g-4">
+                    {% for i in product %}
+                    <div class="col-lg-4 col-md-6 col-sm-6">
+                        <div class="card-3d">
+                            <div class="img-wrapper">
+                                <span class="badge-new">New</span>
+                                <a href="/add_to_wishlist/{{ i.id }}" class="wishlist-btn"><i class="fa fa-heart-o"></i></a>
+
+                              {% if i.is_sub_product %}
+    <a href="/singlesubproduct/{{ i.id }}">
+        <img src="/media/{{ i.image }}" alt="{{ i.name }}">
+    </a>
+{% else %}
+    <a href="/singleproduct/{{ i.id }}">
+        <img src="/media/{{ i.image }}" alt="{{ i.name }}">
+    </a>
+{% endif %}
+<form action="/insertintocart/" method="post" style="margin: 0;">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="productid" value="{{ i.id }}">
+                                    <input type="hidden" name="price" value="{{ i.price }}">
+                                    <input type="hidden" name="quantity" value="1">
+                                    <button type="submit" class="quick-add-btn">Quick Add <i class="fa fa-plus ms-1"></i></button>
+                                </form>
+                               <form action="/shop" method="GET" class="d-flex mb-4">
+    <!-- પ્રોડક્ટ સર્ચ -->
+    <input type="text" name="query" placeholder="Search product..." value="{{ search_query|default_if_none:'' }}" class="form-control me-2">
+
+    <!-- નવું: લોકેશન સર્ચ -->
+    <input type="text" name="location" placeholder="Enter Area/Location..." value="{{ location_query|default_if_none:'' }}" class="form-control me-2">
+
+    <button type="submit" class="btn btn-dark">Search</button>
+</form>
+                            </div>
+                            <div class="card-body">
+                              {% if i.is_sub_product %}
+    <a href="/singlesubproduct/{{ i.id }}" class="product-name">{{ i.name }}</a>
+{% else %}
+    <a href="/singleproduct/{{ i.id }}" class="product-name">{{ i.name }}</a>
+{% endif %}
+                                <div style="font-size: 13px; color: #555; margin-bottom: 10px;">
+       <p style="margin: 0;"><i class="fa fa-map-marker" style="color: red;"></i> <strong>{{ i.get_shop_name }}</strong> ({{ i.get_location_name }})</p>
+
+    <!-- જો સ્ટોક 0 કે તેથી ઓછો હશે તો જ આ લાલ કલરની લાઈન દેખાશે -->
+    {% if i.qty <= 0 %}
+        <p style="margin: 0; font-weight: 600; color: #dc3545;">
+            <i class="fa fa-times-circle"></i> Out of Stock
+        </p>
+    {% endif %}
+    </div>
+
+    <div class="product-price">
+        RS. {{ i.price }}
+    </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% empty %}
+                    <div class="col-12 text-center py-5">
+                        <div style="background: rgba(255,255,255,0.5); backdrop-filter: blur(10px); padding: 50px; border-radius: 40px;">
+                            <i class="fa fa-gem mb-3" style="font-size: 40px; color: var(--bg-sand-dark);"></i>
+                            <h4 style="font-family: 'Playfair Display'; font-weight: 700;">No items found.</h4>
+                            <p class="text-muted">Explore different categories to find your perfect match.</p>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+
+                <div class="pagination-glass">
+                    <a href="#"><i class="fa fa-angle-left"></i></a>
+                    <a href="#" class="active">1</a>
+                    <a href="#">2</a>
+                    <a href="#">3</a>
+                    <a href="#"><i class="fa fa-angle-right"></i></a>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</section>
+
+<div class="container mb-5 opacity-50 text-center animate-up delay-2" style="border-top: 1px solid rgba(0,0,0,0.05); padding-top: 40px;">
+    <img src="{% static 'img/logo-carousel/logo-1.png' %}" class="mx-3" style="max-width: 90px; filter: grayscale(100%); transition: 0.3s;" onmouseover="this.style.filter='none'" onmouseout="this.style.filter='grayscale(100%)'" alt="">
+    <img src="{% static 'img/logo-carousel/logo-2.png' %}" class="mx-3" style="max-width: 90px; filter: grayscale(100%); transition: 0.3s;" onmouseover="this.style.filter='none'" onmouseout="this.style.filter='grayscale(100%)'" alt="">
+    <img src="{% static 'img/logo-carousel/logo-3.png' %}" class="mx-3" style="max-width: 90px; filter: grayscale(100%); transition: 0.3s;" onmouseover="this.style.filter='none'" onmouseout="this.style.filter='grayscale(100%)'" alt="">
+</div>
+
+{% endblock %}

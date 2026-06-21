@@ -1,0 +1,399 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block main %}
+
+<style>
+    /* =========================================
+       ULTRA-ATTRACTIVE EDITORIAL CART (UPDATED)
+       ========================================= */
+    .cart-section {
+        padding: 50px 0 100px;
+        background-color: var(--bg-main);
+    }
+
+    .page-title {
+        font-family: 'Playfair Display', serif;
+        font-size: 3.5rem;
+        font-weight: 500;
+        color: var(--text-dark);
+        margin-bottom: 10px;
+        letter-spacing: -1px;
+    }
+    .page-subtitle {
+        font-family: 'Jost', sans-serif;
+        font-size: 13px;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        color: var(--text-muted);
+        margin-bottom: 50px;
+        display: block;
+    }
+
+    .cart-header-row {
+        font-family: 'Jost', sans-serif;
+        font-size: 11px;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        color: var(--text-muted);
+        border-bottom: 1px solid var(--text-dark);
+        padding-bottom: 15px;
+        margin-bottom: 0;
+    }
+
+    .cart-item-row {
+        border-bottom: 1px solid var(--border-light);
+        padding: 40px 0;
+        transition: background-color 0.4s ease;
+    }
+    .cart-item-row:hover {
+        background-color: #faf9f8;
+    }
+
+    .cart-img-wrap {
+        width: 140px;
+        aspect-ratio: 3/4;
+        background: #f4f4f4;
+        overflow: hidden;
+        position: relative;
+    }
+    .cart-img-wrap img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .cart-img-wrap:hover img {
+        transform: scale(1.08);
+    }
+
+    .item-title {
+        font-family: 'Playfair Display', serif;
+        font-size: 22px;
+        font-weight: 500;
+        color: var(--text-dark);
+        text-decoration: none;
+        display: block;
+        margin-bottom: 5px;
+        transition: 0.3s;
+    }
+    .item-title:hover { color: var(--text-muted); }
+
+    .item-price {
+        font-family: 'Jost', sans-serif;
+        color: var(--text-muted);
+        font-size: 15px;
+        margin-bottom: 15px;
+    }
+
+    .qty-minimal {
+        display: inline-flex;
+        align-items: center;
+        border: 1px solid var(--border-light);
+        padding: 5px;
+        background: #fff;
+    }
+    .qty-minimal a {
+        color: var(--text-dark);
+        text-decoration: none;
+        font-size: 14px;
+        width: 30px;
+        height: 30px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: 0.3s;
+        background: #faf9f8;
+    }
+    .qty-minimal a:hover { background: var(--text-dark); color: #fff; }
+    .qty-minimal span {
+        font-weight: 500;
+        font-size: 14px;
+        width: 40px;
+        text-align: center;
+    }
+
+    .remove-link {
+        font-family: 'Jost', sans-serif;
+        font-size: 11px;
+        text-transform: uppercase;
+        letter-spacing: 1.5px;
+        color: var(--text-muted);
+        text-decoration: none;
+        position: relative;
+        display: inline-block;
+        padding-bottom: 2px;
+    }
+    .remove-link::after {
+        content: '';
+        position: absolute;
+        width: 100%; height: 1px;
+        bottom: 0; left: 0;
+        background-color: var(--text-muted);
+        transform: scaleX(0);
+        transition: transform 0.3s ease-out;
+    }
+    .remove-link:hover::after { transform: scaleX(1); background-color: var(--text-dark); }
+
+    .checkout-sidebar-wrapper {
+        position: sticky;
+        top: 100px;
+    }
+
+    .checkout-sidebar {
+        background-color: #faf9f8;
+        padding: 50px 40px;
+        border: 1px solid var(--border-light);
+    }
+
+    .checkout-title {
+        font-family: 'Playfair Display', serif;
+        font-size: 24px;
+        margin-bottom: 30px;
+        font-weight: 500;
+        color: var(--text-dark);
+        border-bottom: 1px solid var(--border-light);
+        padding-bottom: 20px;
+    }
+
+    .minimal-input, .minimal-select, .minimal-textarea {
+        width: 100%;
+        background: transparent;
+        border: none;
+        border-bottom: 1px solid var(--border-light);
+        padding: 10px 0;
+        font-family: 'Jost', sans-serif;
+        font-size: 14px;
+        color: var(--text-dark);
+        margin-bottom: 30px;
+        outline: none;
+        border-radius: 0;
+    }
+
+    .minimal-label {
+        font-family: 'Jost', sans-serif;
+        font-size: 10px;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        color: var(--text-muted);
+        margin-bottom: 5px;
+        display: block;
+    }
+
+    .btn-checkout {
+        background: var(--text-dark);
+        color: #fff;
+        border: 1px solid var(--text-dark);
+        width: 100%;
+        padding: 18px;
+        font-family: 'Jost', sans-serif;
+        font-size: 12px;
+        font-weight: 500;
+        letter-spacing: 3px;
+        text-transform: uppercase;
+        transition: all 0.4s ease;
+        cursor: pointer;
+        margin-top: 20px;
+    }
+    .btn-checkout:hover:not(:disabled) { background: transparent; color: var(--text-dark); }
+
+    .total-display {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-end;
+        margin-bottom: 40px;
+    }
+    .total-label {
+        font-family: 'Jost', sans-serif;
+        font-size: 14px;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        color: var(--text-muted);
+    }
+    .total-amount {
+        font-family: 'Playfair Display', serif;
+        font-size: 32px;
+        font-weight: 600;
+        color: var(--text-dark);
+        line-height: 1;
+    }
+</style>
+
+<section class="cart-section">
+    <div class="container">
+        <div class="row">
+
+            <!-- LEFT SIDE: CART ITEMS -->
+            <div class="col-lg-7 mb-5 mb-lg-0 pe-lg-5">
+                <h1 class="page-title">Shopping Bag</h1>
+                <span class="page-subtitle">{{ request.session.cart_count|default:"0" }} Items curated in your bag</span>
+
+                <div class="row cart-header-row d-none d-md-flex">
+                    <div class="col-6">Item</div>
+                    <div class="col-3 text-center">Quantity</div>
+                    <div class="col-3 text-end">Total</div>
+                </div>
+
+                {% for i in data %}
+                <div class="row cart-item-row align-items-center">
+
+                    <div class="col-12 col-md-6 d-flex mb-4 mb-md-0">
+                        <div class="cart-img-wrap me-4">
+                            {% if i.sub_product %}
+                                <a href="/singlesubproduct/{{i.sub_product.id}}">
+                                    <img src="/media/{{i.sub_product.image}}" alt="{{i.sub_product.name}}">
+                                </a>
+                            {% else %}
+                                <a href="/singleproduct/{{i.product.id}}">
+                                    <img src="/media/{{i.product.image}}" alt="{{i.product.name}}">
+                                </a>
+                            {% endif %}
+                        </div>
+                        <div class="d-flex flex-column justify-content-center">
+                            {% if i.sub_product %}
+                                <a href="/singlesubproduct/{{i.sub_product.id}}" class="item-title">{{i.sub_product.name}}</a>
+                                <span style="font-size: 12px; color: var(--text-muted); font-family: 'Jost';">Variant of {{ i.product.name }}</span>
+                            {% else %}
+                                <a href="/singleproduct/{{i.product.id}}" class="item-title">{{i.product.name}}</a>
+                            {% endif %}
+
+                            {% if i.selected_size %}
+                                <div style="font-size: 13px; font-family: 'Jost', sans-serif; color: var(--text-dark); margin-top: 5px;">
+                                    <strong>Size:</strong> {{ i.selected_size }}
+                                </div>
+                            {% endif %}
+
+                            <div class="item-price mt-2">
+                                Rs. {% if i.sub_product %}{{i.sub_product.price}}{% else %}{{i.product.price}}{% endif %}
+                            </div>
+
+                            <div class="d-md-none mt-3">
+                                <a class="remove-link" href="/deletecart/{{i.id}}">Remove</a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-6 col-md-3 text-md-center">
+                        <div class="qty-minimal">
+                            <a href="/decrease/{{i.id}}">-</a>
+                            <span>{{i.quantity}}</span>
+                            <a href="/increase/{{i.id}}">+</a>
+                        </div>
+                    </div>
+
+                    <div class="col-6 col-md-3 text-end d-flex flex-column justify-content-center align-items-end">
+                        <div style="font-family: 'Playfair Display', serif; font-size: 20px; font-weight: 500; color: var(--text-dark); margin-bottom: 15px;">
+                            Rs. {{i.total_amount}}
+                        </div>
+                        <a class="remove-link d-none d-md-inline-block" href="/deletecart/{{i.id}}">Remove Item</a>
+                    </div>
+
+                </div>
+                {% empty %}
+                <div class="text-center py-5" style="border-bottom: 1px solid var(--border-light); margin-top: 40px;">
+                    <i class="ti-bag mb-3" style="font-size: 40px; color: var(--border-light);"></i>
+                    <p class="text-muted mb-4" style="font-size: 15px; font-family: 'Jost', sans-serif;">Your shopping bag is currently empty.</p>
+                    <a href="/shop" class="btn-checkout" style="padding: 15px 40px; display: inline-block; width: auto;">Discover the Collection</a>
+                </div>
+                {% endfor %}
+
+                {% if data %}
+                <div class="mt-5">
+                    <a href="/shop" style="font-family: 'Jost', sans-serif; font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 2px; text-decoration: none; transition: 0.3s;" onmouseover="this.style.color='#111'" onmouseout="this.style.color='#777'">
+                        <i class="ti-arrow-left me-2"></i> Continue Shopping
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- RIGHT SIDE: ORDER SUMMARY -->
+            <div class="col-lg-5">
+                <div class="checkout-sidebar-wrapper">
+                    <div class="checkout-sidebar">
+                        <h4 class="checkout-title">Order Summary</h4>
+
+                        <form action="/placeorder" method="POST">
+                            {% csrf_token %}
+                            <!-- Nava code mujab total session mathi levi -->
+                            <input type="hidden" name="total_amount" value="{{ request.session.cart_total|default:total }}">
+
+                            <div class="total-display">
+                                <span class="total-label">Estimated Total</span>
+                                <span class="total-amount">Rs. {{ request.session.cart_total|default:total|default:"0" }}</span>
+                            </div>
+
+                            <div class="pt-4" style="border-top: 1px solid var(--border-light);">
+                               <label class="minimal-label" for="phone">Phone Number</label>
+<input type="tel" id="phone" name="phone" required class="minimal-input" placeholder="10-digit mobile number" maxlength="10" pattern="[0-9]{10}" title="Please enter exactly 10 digits">
+
+                                <label class="minimal-label" for="address">Delivery Address</label>
+                                <textarea id="address" name="address" required class="minimal-textarea" placeholder="Street, City, Postal Code"></textarea>
+
+                                <label class="minimal-label" for="payment">Payment Method</label>
+                                <select id="payment" name="payment" required class="minimal-select">
+                                    <option value="" disabled selected>Select a method...</option>
+                                    <option value="Cash on Delivery">Cash on Delivery</option>
+                                    <option value="Online">Online Payment (Razorpay)</option>
+                                </select>
+                            </div>
+
+                            {% for i in data %}
+                                <input type="hidden" value="{{i.status}}" name="status">
+                            {% endfor %}
+
+                            {% if data %}
+                                <button type="submit" class="btn-checkout">Secure Checkout</button>
+                            {% else %}
+                                <button type="button" class="btn-checkout" disabled>Bag is Empty</button>
+                            {% endif %}
+
+                            <div class="text-center mt-4">
+                                <span style="font-family: 'Jost', sans-serif; font-size: 10px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px;">
+                                    <i class="ti-lock me-1"></i> Secure Encrypted Transaction
+                                </span>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</section>
+
+<!-- Footer Logos Section -->
+<div class="container mb-5 pb-5 opacity-50 text-center" style="border-top: 1px solid var(--border-light); padding-top: 50px;">
+    <span style="font-family: 'Jost', sans-serif; font-size: 10px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 2px; display: block; margin-bottom: 20px;">As Featured In</span>
+    <img src="{% static 'img/logo-carousel/logo-1.png' %}" class="mx-4" style="max-width: 90px; filter: grayscale(100%); transition: 0.3s;" onmouseover="this.style.filter='none'" onmouseout="this.style.filter='grayscale(100%)'">
+    <img src="{% static 'img/logo-carousel/logo-2.png' %}" class="mx-4" style="max-width: 90px; filter: grayscale(100%); transition: 0.3s;" onmouseover="this.style.filter='none'" onmouseout="this.style.filter='grayscale(100%)'">
+    <img src="{% static 'img/logo-carousel/logo-3.png' %}" class="mx-4" style="max-width: 90px; filter: grayscale(100%); transition: 0.3s;" onmouseover="this.style.filter='none'" onmouseout="this.style.filter='grayscale(100%)'">
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const phoneInput = document.getElementById('phone');
+        const checkoutForm = document.querySelector('form[action="/placeorder"]');
+
+        // 1. Live Validation: Only allow numbers to be typed (characters remove thashe)
+        phoneInput.addEventListener('input', function(e) {
+            this.value = this.value.replace(/[^0-9]/g, '');
+        });
+
+        // 2. Submit Validation: 10 digits thi ocha hoy toh form submit nahi thai
+        if(checkoutForm) {
+            checkoutForm.addEventListener('submit', function(e) {
+                const phoneVal = phoneInput.value.trim();
+
+                if (phoneVal.length !== 10) {
+                    e.preventDefault(); // Stop form submission
+                    alert("Please enter exactly 10 digits for your phone number.");
+                    phoneInput.focus();
+                    phoneInput.style.borderBottom = "2px solid #ff4757"; // Red border for error
+                } else {
+                    phoneInput.style.borderBottom = "1px solid var(--border-light)";
+                }
+            });
+        }
+    });
+</script>
+
+{% endblock %}

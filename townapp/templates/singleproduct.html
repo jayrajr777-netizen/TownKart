@@ -1,0 +1,518 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block main %}
+<style>
+    /* Ultra-Premium Editorial & 3D Styling combined */
+    :root {
+        --bg-blush: #fdfbfb;
+        --bg-sand: #dcbfae;
+        --bg-sand-dark: #c4a491;
+        --text-dark: #1a1a1a;
+        --text-muted: #888888;
+        --gold: #e7ab3c;
+        --3d-shadow: 0 20px 40px rgba(0, 0, 0, 0.08);
+        --3d-shadow-hover: 0 30px 50px rgba(220, 191, 174, 0.4);
+    }
+
+    body {
+        background-color: var(--bg-blush);
+        font-family: 'Jost', sans-serif;
+        overflow-x: hidden;
+    }
+
+    /* --- Animations --- */
+    @keyframes fadeUp {
+        0% { opacity: 0; transform: translateY(40px); }
+        100% { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes floatBlob {
+        0% { transform: translate(0, 0) scale(1); }
+        33% { transform: translate(30px, -50px) scale(1.1); }
+        66% { transform: translate(-20px, 20px) scale(0.9); }
+        100% { transform: translate(0, 0) scale(1); }
+    }
+
+    .animate-up { opacity: 0; animation: fadeUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+    .delay-1 { animation-delay: 0.1s; }
+    .delay-2 { animation-delay: 0.3s; }
+    .delay-3 { animation-delay: 0.5s; }
+
+    /* --- 1. Glassmorphism Breadcrumb --- */
+    .breadcrumb-3d {
+        background: rgba(255, 255, 255, 0.6);
+        backdrop-filter: blur(15px);
+        -webkit-backdrop-filter: blur(15px);
+        border-radius: 50px;
+        padding: 15px 30px;
+        box-shadow: 0 10px 20px rgba(0,0,0,0.03), inset 0 0 0 1px rgba(255,255,255,0.8);
+        display: inline-block;
+        margin: 40px 0 0 0;
+        font-weight: 500;
+        font-size: 14px;
+        position: relative;
+        z-index: 20;
+    }
+    .breadcrumb-3d a { color: var(--text-dark); margin-right: 10px; transition: 0.3s; text-decoration: none;}
+    .breadcrumb-3d a:hover { color: var(--bg-sand-dark); }
+    .breadcrumb-3d span { color: var(--text-muted); }
+
+    /* --- 2. Editorial Hero Layout --- */
+    .editorial-showcase {
+        padding: 40px 0 80px;
+        position: relative;
+    }
+
+    /* Animated Background Blobs */
+    .blob-1, .blob-2 {
+        position: absolute;
+        filter: blur(80px);
+        border-radius: 50%;
+        z-index: 0;
+        opacity: 0.6;
+        animation: floatBlob 10s infinite ease-in-out;
+    }
+    .blob-1 { width: 400px; height: 400px; background: var(--bg-sand); top: 5%; left: 5%; }
+    .blob-2 { width: 350px; height: 350px; background: #e0d4cc; bottom: -5%; right: 10%; animation-delay: -5s; }
+
+    /* Main Image Wrapper - FIX APPLIED HERE */
+    .product-image-3d {
+        position: relative;
+        z-index: 2;
+        border-radius: 30px;
+        overflow: hidden;
+        box-shadow: 0 30px 60px rgba(0,0,0,0.1);
+        width: 100%;
+        aspect-ratio: 4 / 5; /* This keeps the image properly proportioned */
+    }
+    .product-image-3d img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.6s ease; }
+    .product-image-3d:hover img { transform: scale(1.05); }
+
+    /* --- 3. Floating Glass Info Card - FIX APPLIED HERE --- */
+    .product-info-glass {
+        background: rgba(255, 255, 255, 0.85); /* Slightly less transparent for better reading */
+        backdrop-filter: blur(30px);
+        -webkit-backdrop-filter: blur(30px);
+        border-radius: 30px;
+        padding: 45px 50px;
+        box-shadow: 0 20px 50px rgba(0,0,0,0.08), inset 0 0 0 1px rgba(255,255,255,0.8);
+        position: relative;
+        z-index: 10;
+        margin-left: -8%; /* Subtle overlap instead of a big gap */
+    }
+
+    .product-title {
+        font-family: 'Playfair Display', serif;
+        font-size: 3rem;
+        font-weight: 700;
+        color: var(--text-dark);
+        line-height: 1.2;
+        margin-bottom: 10px;
+        letter-spacing: -1px;
+    }
+
+    .product-price-badge {
+        font-family: 'Jost', sans-serif;
+        font-size: 2rem;
+        font-weight: 600;
+        color: var(--text-dark);
+        margin-bottom: 25px;
+        display: flex;
+        align-items: center;
+        gap: 15px;
+    }
+    .price-tag-icon {
+        background: var(--bg-sand);
+        color: #fff;
+        padding: 5px 15px;
+        border-radius: 50px;
+        font-size: 14px;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        box-shadow: 0 10px 20px rgba(220, 191, 174, 0.4);
+    }
+
+    /* --- Custom 3D Interactive Swatches --- */
+    .swatch-group { margin-bottom: 25px; }
+    .swatch-label { font-size: 12px; text-transform: uppercase; letter-spacing: 2px; color: var(--text-muted); font-weight: 600; margin-bottom: 10px; display: block; }
+
+    .size-swatches { display: flex; gap: 15px; flex-wrap: wrap; }
+    .size-swatches input[type="radio"] { display: none; }
+    .size-pill {
+        width: 50px; height: 50px;
+        display: flex; align-items: center; justify-content: center;
+        border-radius: 15px;
+        background: #fff;
+        box-shadow: 0 10px 20px rgba(0,0,0,0.05);
+        font-weight: 600; font-size: 16px; color: var(--text-dark);
+        cursor: pointer; transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        border: 2px solid transparent;
+    }
+    .size-pill:hover { transform: translateY(-5px); box-shadow: 0 15px 25px rgba(0,0,0,0.1); }
+    .size-swatches input[type="radio"]:checked + .size-pill {
+        background: var(--text-dark); color: #fff;
+        transform: scale(0.95); box-shadow: inset 0 5px 10px rgba(0,0,0,0.3);
+    }
+
+    /* --- Action Area & Bundle --- */
+    .action-row {
+        display: flex;
+        align-items: center;
+        gap: 20px;
+        margin-top: 15px;
+        flex-wrap: wrap;
+    }
+
+    .qty-3d {
+        display: flex; align-items: center; background: #fff;
+        border-radius: 50px; padding: 5px;
+        box-shadow: 0 10px 20px rgba(0,0,0,0.05);
+    }
+    .qty-btn {
+        width: 45px; height: 45px; border-radius: 50%; border: none; background: #f8f9fa;
+        font-size: 20px; font-weight: bold; cursor: pointer; transition: 0.3s;
+    }
+    .qty-btn:hover { background: var(--bg-sand); color: #fff; transform: scale(1.1); }
+    .qty-input { width: 50px; text-align: center; border: none; background: transparent; font-weight: 700; font-size: 18px; }
+
+    .btn-super-add {
+        flex: 1;
+        background: linear-gradient(45deg, #1a1a1a, #333333);
+        color: #fff;
+        padding: 16px 30px;
+        border-radius: 50px;
+        font-size: 14px; font-weight: 600; letter-spacing: 2px; text-transform: uppercase;
+        border: none; cursor: pointer;
+        box-shadow: 0 20px 40px rgba(0,0,0,0.2), inset 0 2px 0 rgba(255,255,255,0.2);
+        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        display: flex; align-items: center; justify-content: center; gap: 10px;
+        min-width: 200px;
+    }
+    .btn-super-add:hover { transform: translateY(-5px); box-shadow: 0 25px 45px rgba(0,0,0,0.3); }
+
+    /* --- Premium 3D Wishlist Button --- */
+    .btn-wishlist-3d {
+        width: 55px; height: 55px; border-radius: 50%;
+        background: #fff; color: var(--text-dark);
+        display: flex; align-items: center; justify-content: center;
+        font-size: 20px; text-decoration: none;
+        box-shadow: 0 15px 30px rgba(0,0,0,0.08); border: 2px solid transparent;
+        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        flex-shrink: 0; align-self: center;
+    }
+    .btn-wishlist-3d:hover {
+        background: var(--bg-sand-dark); color: #fff;
+        transform: translateY(-5px); box-shadow: 0 20px 40px rgba(220, 191, 174, 0.4);
+    }
+
+    /* --- 4. Modern 3D Tabs --- */
+    .tabs-3d-container {
+        background: rgba(255, 255, 255, 0.8);
+        backdrop-filter: blur(20px);
+        border-radius: 40px;
+        padding: 40px;
+        box-shadow: var(--3d-shadow);
+        border: 1px solid rgba(255,255,255,0.9);
+        position: relative;
+        z-index: 5;
+    }
+    .nav-tabs-3d {
+        display: flex; gap: 20px; border-bottom: none; margin-bottom: 30px; justify-content: center; flex-wrap: wrap;
+    }
+    .nav-tabs-3d button {
+        background: #fff; border: none; padding: 12px 30px; border-radius: 50px;
+        font-weight: 600; color: var(--text-muted); transition: 0.3s;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+    }
+    .nav-tabs-3d button.active {
+        background: var(--bg-sand-dark); color: #fff;
+        box-shadow: inset 0 5px 10px rgba(0,0,0,0.1); transform: translateY(2px);
+    }
+
+    /* --- 5. Related Products 3D Grid --- */
+    .grid-4-cols { display: grid; grid-template-columns: repeat(4, 1fr); gap: 25px; }
+    .card-3d {
+        background: #ffffff; border-radius: 30px; padding: 15px; text-align: center;
+        box-shadow: 0 15px 35px rgba(0,0,0,0.04); transition: all 0.4s ease; cursor: pointer;
+    }
+    .card-3d:hover { transform: translateY(-10px); box-shadow: var(--3d-shadow-hover); }
+    .card-3d .img-wrapper { border-radius: 20px; overflow: hidden; aspect-ratio: 3/4; margin-bottom: 20px; }
+    .card-3d img { width: 100%; height: 100%; object-fit: cover; transition: 0.6s ease; }
+    .card-3d:hover img { transform: scale(1.1); }
+
+    /* Mobile Responsive Fixes */
+    @media (max-width: 991px) {
+        .product-image-3d { aspect-ratio: 1 / 1; border-radius: 25px; }
+        .product-info-glass { margin-left: 0; margin-top: -30px; padding: 30px 20px; }
+        .product-title { font-size: 2.2rem; }
+        .action-row { justify-content: center; }
+        .grid-4-cols { grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (max-width: 576px) {
+        .grid-4-cols { grid-template-columns: 1fr; }
+    }
+</style>
+
+<div class="container animate-up">
+    <div class="breadcrumb-3d">
+        <a href="/"><i class="fa fa-home"></i> Home</a> &rsaquo;
+        <a href="/shop">Shop</a> &rsaquo;
+        <span>{{data.name|default:"Product Details"}}</span>
+    </div>
+</div>
+
+<section class="editorial-showcase">
+    <div class="blob-1"></div>
+    <div class="blob-2"></div>
+
+    <div class="container">
+        <div class="row align-items-center">
+
+            <div class="col-lg-5 animate-up">
+                <div class="product-image-3d">
+                    <img id="mainImage" src="/media/{{data.image}}" alt="{{data.name}}">
+                </div>
+
+                <div class="d-flex justify-content-center flex-wrap gap-3 mt-4 animate-up delay-1">
+                    <div class="pt-3d active-thumb" data-imgbigurl="/media/{{data.image}}" style="width: 80px; height: 80px; border-radius: 20px; overflow: hidden; box-shadow: 0 10px 20px rgba(0,0,0,0.1); cursor: pointer; border: 2px solid #1a1a1a;">
+                        <img src="/media/{{data.image}}" style="width: 100%; height: 100%; object-fit: cover;" alt="">
+                    </div>
+               {% for img in product_images %}
+                <div class="pt-3d" data-imgbigurl="/media/{{img.images}}" style="width: 80px; height: 80px; border-radius: 20px; overflow: hidden; box-shadow: 0 10px 20px rgba(0,0,0,0.1); cursor: pointer; border: 2px solid transparent; opacity: 0.6;">
+                    <img src="/media/{{img.images}}" style="width: 100%; height: 100%; object-fit: cover;" alt="">
+                </div>
+                {% endfor %}
+                </div>
+            </div>
+
+            <div class="col-lg-7 animate-up delay-2">
+                <div class="product-info-glass">
+
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="badge bg-dark text-white px-3 py-2 rounded-pill shadow-sm me-3">In Stock</div>
+                        <div style="color: var(--gold); font-size: 15px;">
+                            <i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star-half-o"></i>
+                            <span class="text-muted ms-2" style="font-size: 13px;">(24 Reviews)</span>
+                        </div>
+                    </div>
+
+                    <h1 class="product-title">{{data.name}}</h1>
+
+                    <div class="product-price-badge">
+                        Rs. {{data.price}}
+                        <span class="price-tag-icon">New Arrival</span>
+                    </div>
+
+                    <p style="color: #555; font-size: 16px; line-height: 1.8; margin-bottom: 30px;">
+                        {{data.description}} Elevate your everyday wardrobe with this meticulously crafted piece, designed to offer both stunning visual appeal and unmatched comfort.
+                    </p>
+
+                    {% if data.sub_products.all %}
+                        <div class="mt-4 mb-4">
+                            <h6 style="font-family: 'Playfair Display'; font-weight: 700; font-size: 16px; text-transform: uppercase; letter-spacing: 1.5px; color: var(--bg-sand-dark); margin-bottom: 15px;">Available Variations</h6>
+
+                            <div style="display: flex; flex-wrap: wrap; gap: 15px;">
+                                {% for sub in data.sub_products.all %}
+                                <div style="transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);" onmouseover="this.style.transform='scale(1.1) translateY(-5px)';" onmouseout="this.style.transform='scale(1) translateY(0)';">
+                                    <a href="/singlesubproduct/{{ sub.id }}" style="text-decoration: none; display: block;" title="View {{ sub.name }} details">
+                                        <img src="/media/{{ sub.image }}" style="width: 85px; height: 85px; border-radius: 18px; object-fit: cover; box-shadow: 0 10px 20px rgba(0,0,0,0.08); border: 2px solid transparent; transition: border-color 0.3s;" onmouseover="this.style.borderColor='var(--text-dark)';" onmouseout="this.style.borderColor='transparent';" alt="{{ sub.name }}">
+                                    </a>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    {% endif %}
+                    <form action="/insertintocart/" method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        <input type="hidden" name="productid" value="{{data.id}}">
+                        <input type="hidden" name="price" value="{{data.price}}">
+
+                        {% if sizes %}
+                        <div class="swatch-group" style="margin-bottom: 25px;">
+                            <span class="swatch-label">Select Size</span>
+                            <div class="size-swatches">
+                                {% for s in sizes %}
+                                <label>
+                                    <input type="radio" name="size" value="{{ s }}" {% if forloop.first %}checked{% endif %} required>
+                                    <span class="size-pill">{{ s }}</span>
+                                </label>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        {% endif %}
+
+                        <div class="action-row">
+                            <div>
+                                <div class="qty-3d">
+                                    <button type="button" class="qty-btn" onclick="var input = document.getElementById('qtyInput'); var val = parseInt(input.value); if(val > 1) { input.value = val - 1; }">-</button>
+                                    <input type="text" id="qtyInput" name="quantity" class="qty-input" value="1">
+                                    <button type="button" class="qty-btn" onclick="var input = document.getElementById('qtyInput'); input.value = parseInt(input.value) + 1;">+</button>
+                                </div>
+                            </div>
+
+                            <div class="d-flex gap-3 flex-grow-1">
+                                <button type="submit" class="btn-super-add">
+                                    Add To Bag <i class="fa fa-shopping-bag ms-2"></i>
+                                </button>
+
+                                <a href="/add_to_wishlist/{{data.id}}" class="btn-wishlist-3d" title="Save to Wishlist">
+                                    <i class="fa fa-heart-o"></i>
+                                </a>
+
+<!--                                <a href="/chat/{{ data.shop.id }}/" class="btn-wishlist-3d" title="Live Chat Support" style="background: var(&#45;&#45;bg-sand-dark); color: #fff; border-color: var(&#45;&#45;bg-sand-dark);">-->
+<!--                                    <i class="fa fa-comments"></i>-->
+<!--                                </a>-->
+                            </div>
+                        </div>
+                    </form>
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+</section>
+
+<!--<section class="container mb-5 animate-up delay-3">-->
+<!--    <div class="tabs-3d-container">-->
+<!--        <div class="nav-tabs-3d" id="myTab" role="tablist">-->
+<!--            <button class="active" id="desc-tab" data-bs-toggle="tab" data-bs-target="#desc" type="button" role="tab">The Details</button>-->
+<!--            <button id="specs-tab" data-bs-toggle="tab" data-bs-target="#specs" type="button" role="tab">Specifications</button>-->
+<!--            <button id="reviews-tab" data-bs-toggle="tab" data-bs-target="#reviews" type="button" role="tab">Reviews (24)</button>-->
+<!--        </div>-->
+
+<!--        <div class="tab-content">-->
+<!--            <div class="tab-pane fade show active" id="desc" role="tabpanel">-->
+<!--                <div class="row align-items-center">-->
+<!--                    <div class="col-lg-7">-->
+<!--                        <h4 style="font-family: 'Playfair Display'; font-weight: 700; margin-bottom: 20px; font-size: 2rem;">Premium Craftsmanship</h4>-->
+<!--                        <p style="color: #666; line-height: 1.8; font-size: 16px;">Experience the perfect blend of style and comfort. Our products are crafted using carefully selected materials to ensure durability while maintaining a lightweight, breathable feel. Perfect for both casual outings and elevated evening events.</p>-->
+<!--                    </div>-->
+<!--                    <div class="col-lg-5 text-center mt-4 mt-lg-0">-->
+<!--                        <img src="{% static 'img/product-single/tab-desc.jpg' %}" style="border-radius: 30px; box-shadow: 0 20px 40px rgba(0,0,0,0.1);" alt="Detail">-->
+<!--                    </div>-->
+<!--                </div>-->
+<!--            </div>-->
+
+<!--            <div class="tab-pane fade" id="specs" role="tabpanel">-->
+<!--                <table class="table table-borderless" style="max-width: 600px; margin: 0 auto; font-size: 16px;">-->
+<!--                    <tbody>-->
+<!--                        <tr style="border-bottom: 1px dashed #ddd;">-->
+<!--                            <th style="color: #888; font-weight: 500; padding: 20px 0;">Weight</th>-->
+<!--                            <td style="font-weight: 600; padding: 20px 0; text-align: right; color: var(&#45;&#45;text-dark);">1.3 kg</td>-->
+<!--                        </tr>-->
+<!--                        <tr style="border-bottom: 1px dashed #ddd;">-->
+<!--                            <th style="color: #888; font-weight: 500; padding: 20px 0;">Materials</th>-->
+<!--                            <td style="font-weight: 600; padding: 20px 0; text-align: right; color: var(&#45;&#45;text-dark);">100% Organic Cotton</td>-->
+<!--                        </tr>-->
+<!--                        <tr>-->
+<!--                            <th style="color: #888; font-weight: 500; padding: 20px 0;">SKU</th>-->
+<!--                            <td style="font-weight: 600; padding: 20px 0; text-align: right; color: var(&#45;&#45;text-dark);">TK-00012</td>-->
+<!--                        </tr>-->
+<!--                    </tbody>-->
+<!--                </table>-->
+<!--            </div>-->
+
+<!--            <div class="tab-pane fade" id="reviews" role="tabpanel">-->
+<!--                <div class="row justify-content-center">-->
+<!--                    <div class="col-lg-8">-->
+<!--                        <div style="background: #fdfdfd; padding: 30px; border-radius: 25px; margin-bottom: 20px; box-shadow: 0 10px 20px rgba(0,0,0,0.02); border: 1px solid #eee;">-->
+<!--                            <div class="d-flex justify-content-between align-items-center mb-3">-->
+<!--                                <h6 class="mb-0 fw-bold" style="font-size: 18px;">Brandon Kelley</h6>-->
+<!--                                <div style="color: var(&#45;&#45;gold); font-size: 14px;"><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i></div>-->
+<!--                            </div>-->
+<!--                            <p class="mb-0" style="color: #666; font-size: 15px; font-style: italic;">"Absolutely love the quality. Fits perfectly and looks exactly like the pictures! Will definitely buy more colors."</p>-->
+<!--                        </div>-->
+<!--                    </div>-->
+<!--                </div>-->
+<!--            </div>-->
+<!--        </div>-->
+<!--    </div>-->
+<!--</section>-->
+<div class="container mb-5 mt-5 animate-up delay-3">
+    <div class="text-center mb-5">
+        <h2 style="font-family: 'Playfair Display'; font-weight: 700; font-size: 2.8rem;">You May Also Like</h2>
+        <p class="text-muted">Curated pieces to match your style</p>
+    </div>
+
+  <div class="grid-4-cols">
+    {% for rel_prod in related_products %}
+    <div class="card-3d" onclick="window.location.href='/singleproduct/{{ rel_prod.id }}'" style="cursor: pointer;">
+        <div class="img-wrapper">
+            {% if rel_prod.image %}
+             <img src="/media/{{ rel_prod.image }}" alt="{{ rel_prod.name }}" style="width: 100%; height: 100%; object-fit: cover;">
+            {% endif %}
+        </div>
+        <h4 style="font-family: 'Playfair Display'; font-weight: 700; font-size: 18px; margin-top: 15px;">{{ rel_prod.name }}</h4>
+        <p style="font-weight: 600; color: var(--bg-sand-dark); font-size: 16px; margin: 0;">₹{{ rel_prod.price }}</p>
+    </div>
+    {% empty %}
+        <p style="color: var(--text-muted); font-size: 15px; grid-column: span 4; text-align: center; margin-top: 20px;">
+            No other products available in this category yet.
+        </p>
+    {% endfor %}
+</div>
+    <div class="container mb-5 opacity-50 text-center animate-up delay-3">
+    <img src="{% static 'img/logo-carousel/logo-1.png' %}" class="mx-4" style="max-width: 100px; filter: grayscale(100%); transition: 0.3s;" onmouseover="this.style.filter='none'" onmouseout="this.style.filter='grayscale(100%)'" alt="">
+    <img src="{% static 'img/logo-carousel/logo-2.png' %}" class="mx-4" style="max-width: 100px; filter: grayscale(100%); transition: 0.3s;" onmouseover="this.style.filter='none'" onmouseout="this.style.filter='grayscale(100%)'" alt="">
+    <img src="{% static 'img/logo-carousel/logo-3.png' %}" class="mx-4" style="max-width: 100px; filter: grayscale(100%); transition: 0.3s;" onmouseover="this.style.filter='none'" onmouseout="this.style.filter='grayscale(100%)'" alt="">
+</div>
+
+<section class="container mb-5 animate-up delay-3">
+    <div style="background: #fff; border-radius: 40px; padding: 60px; box-shadow: 0 20px 50px rgba(0,0,0,0.03); border: 1px solid rgba(0,0,0,0.02);">
+        <div class="row align-items-center">
+            <div class="col-lg-4 mb-4 mb-lg-0">
+                <h3 style="font-family: 'Playfair Display'; font-weight: 700; font-size: 2.5rem; margin-bottom: 20px;">Why You'll Love It</h3>
+                <p style="color: #666; line-height: 1.8;">Our commitment to quality means this piece not only looks incredible but is built to last. Perfect for transitioning between seasons.</p>
+            </div>
+
+            <div class="col-lg-7 offset-lg-1">
+                <div class="row g-4">
+                    <div class="col-sm-6">
+                        <div style="background: var(--bg-blush); padding: 30px; border-radius: 25px; height: 100%; transition: 0.3s; cursor: pointer;" onmouseover="this.style.transform='translateY(-10px)'; this.style.boxShadow='0 15px 30px rgba(0,0,0,0.08)';" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none';">
+                            <i class="fa fa-leaf" style="font-size: 28px; color: var(--bg-sand-dark); margin-bottom: 15px;"></i>
+                            <h5 style="font-family: 'Playfair Display'; font-weight: 700; font-size: 20px;">Premium Materials</h5>
+                            <p style="font-size: 14px; color: #666; margin: 0;">Sustainably sourced fabrics that feel incredibly soft against the skin.</p>
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div style="background: var(--bg-blush); padding: 30px; border-radius: 25px; height: 100%; transition: 0.3s; cursor: pointer;" onmouseover="this.style.transform='translateY(-10px)'; this.style.boxShadow='0 15px 30px rgba(0,0,0,0.08)';" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none';">
+                            <i class="fa fa-scissors" style="font-size: 28px; color: var(--bg-sand-dark); margin-bottom: 15px;"></i>
+                            <h5 style="font-family: 'Playfair Display'; font-weight: 700; font-size: 20px;">Tailored Fit</h5>
+                            <p style="font-size: 14px; color: #666; margin: 0;">Designed to flatter your natural silhouette with precision stitching.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+
+
+
+<script>
+    // Smooth Thumbnail Image Swapping Logic
+    document.querySelectorAll('.pt-3d').forEach(thumb => {
+        thumb.addEventListener('click', function() {
+            // Reset borders and opacity
+            document.querySelectorAll('.pt-3d').forEach(t => {
+                t.style.border = '2px solid transparent';
+                t.style.opacity = '0.6';
+            });
+            // Highlight clicked
+            this.style.border = '2px solid #1a1a1a';
+            this.style.opacity = '1';
+
+            // Swap image with a quick fade effect
+            const mainImg = document.getElementById('mainImage');
+            mainImg.style.opacity = '0.5';
+            setTimeout(() => {
+                mainImg.src = this.getAttribute('data-imgbigurl');
+                mainImg.style.opacity = '1';
+            }, 150);
+        });
+    });
+</script>
+{% endblock %}

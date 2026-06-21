@@ -1,0 +1,702 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block main %}
+<style>
+   /* --- TownKart Premium Register Design System --- */
+   :root {
+       /* Color Palette */
+       --tk-brand: #111111;
+       --tk-brand-accent: #c4a491;
+       --tk-brand-accent-light: #e6d7ce;
+
+       /* Surfaces */
+       --tk-surface-main: #ffffff;
+       --tk-surface-glass: rgba(255, 255, 255, 0.75);
+       --tk-surface-input: #f9f9fa;
+       --tk-surface-hover: #f1f1f4;
+
+       /* Typography */
+       --tk-text-primary: #111111;
+       --tk-text-secondary: #666666;
+       --tk-text-tertiary: #999999;
+
+       /* Shadows & Effects */
+       --tk-shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.04);
+       --tk-shadow-md: 0 12px 32px rgba(0, 0, 0, 0.08);
+       --tk-shadow-lg: 0 24px 48px rgba(0, 0, 0, 0.12);
+
+       /* Transitions */
+       --tk-transition-fast: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+       --tk-transition-smooth: 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+   }
+
+   /* --- Layout & Ambient Background --- */
+   .tk-login-section {
+       position: relative;
+       min-height: 90vh;
+       display: flex;
+       align-items: center;
+       justify-content: center;
+       padding: 4rem 1rem;
+       overflow: hidden;
+       background-color: #fcfcfc;
+   }
+
+   .tk-ambient-bg {
+       position: absolute;
+       inset: 0;
+       z-index: 0;
+       overflow: hidden;
+       pointer-events: none;
+   }
+
+   .tk-ambient-blob {
+       position: absolute;
+       filter: blur(80px);
+       opacity: 0.5;
+       border-radius: 50%;
+       animation: tk-drift 20s infinite alternate ease-in-out;
+   }
+
+   .tk-ambient-blob-1 {
+       top: -10%; left: -10%;
+       width: 50vw; height: 50vw;
+       background: radial-gradient(circle, rgba(196, 164, 145, 0.3) 0%, transparent 70%);
+   }
+
+   .tk-ambient-blob-2 {
+       bottom: -10%; right: -10%;
+       width: 40vw; height: 40vw;
+       background: radial-gradient(circle, rgba(230, 240, 235, 0.6) 0%, transparent 70%);
+       animation-delay: -10s;
+   }
+
+   .tk-container-relative {
+       position: relative;
+       z-index: 1;
+       width: 100%;
+       max-width: 1200px; /* Wider for Register */
+   }
+
+   /* --- The Main Glass Card --- */
+   .tk-login-card {
+       display: flex;
+       flex-direction: row;
+       background: var(--tk-surface-glass);
+       backdrop-filter: blur(24px);
+       -webkit-backdrop-filter: blur(24px);
+       border: 1px solid rgba(255, 255, 255, 0.8);
+       border-radius: 32px;
+       box-shadow: var(--tk-shadow-lg);
+       overflow: hidden;
+       min-height: 650px;
+       align-items: stretch;
+   }
+
+   /* --- Left Column: Form --- */
+   .tk-login-form-side {
+       flex: 1.2;
+       padding: 3rem 4rem;
+       display: flex;
+       flex-direction: column;
+       justify-content: center;
+       background: rgba(255, 255, 255, 0.4);
+   }
+
+   .tk-form-header h2 {
+       font-family: 'Jost', system-ui, sans-serif;
+       font-size: clamp(2rem, 4vw, 2.5rem);
+       font-weight: 700;
+       color: var(--tk-text-primary);
+       letter-spacing: -0.02em;
+       margin-bottom: 0.5rem;
+   }
+
+   .tk-form-header p {
+       color: var(--tk-text-secondary);
+       font-size: 0.95rem;
+       line-height: 1.6;
+       margin-bottom: 2.5rem;
+   }
+
+   /* Input Groups (Floating Labels) */
+   .tk-input-group {
+       position: relative;
+       margin-bottom: 1.2rem;
+       display: flex;
+       align-items: center;
+   }
+
+   .tk-input-icon-left {
+       position: absolute;
+       left: 1.25rem;
+       color: var(--tk-text-tertiary);
+       font-size: 1.1rem;
+       transition: color var(--tk-transition-fast);
+       z-index: 2;
+   }
+
+   .tk-input, .tk-select {
+       width: 100%;
+       background: var(--tk-surface-input);
+       border: 2px solid transparent;
+       border-radius: 16px;
+       padding: 1.25rem 1.25rem 1.25rem 3.5rem;
+       font-size: 0.95rem;
+       color: var(--tk-text-primary);
+       transition: all var(--tk-transition-fast);
+   }
+
+   .tk-select { appearance: none; cursor: pointer; color: var(--tk-text-secondary); }
+
+   .tk-floating-label {
+       position: absolute;
+       left: 3.5rem;
+       top: 50%;
+       transform: translateY(-50%);
+       color: var(--tk-text-tertiary);
+       font-size: 0.95rem;
+       pointer-events: none;
+       transition: all var(--tk-transition-fast);
+       margin: 0;
+   }
+
+   /* Floating Label Logic */
+   .tk-input:focus,
+   .tk-input:not(:placeholder-shown),
+   .tk-select:focus,
+   .tk-select:valid {
+       padding-top: 1.75rem;
+       padding-bottom: 0.75rem;
+       background: var(--tk-surface-main);
+       border-color: var(--tk-brand-accent-light);
+       box-shadow: 0 4px 12px rgba(196, 164, 145, 0.1);
+       outline: none;
+       color: var(--tk-text-primary);
+   }
+
+   .tk-input:focus + .tk-floating-label,
+   .tk-input:not(:placeholder-shown) + .tk-floating-label,
+   .tk-select:focus + .tk-floating-label,
+   .tk-select:valid + .tk-floating-label {
+       top: 1rem;
+       font-size: 0.7rem;
+       font-weight: 600;
+       color: var(--tk-brand-accent);
+       text-transform: uppercase;
+       letter-spacing: 0.5px;
+   }
+
+   .tk-input:focus ~ .tk-input-icon-left, .tk-select:focus ~ .tk-input-icon-left {
+       color: var(--tk-brand-accent);
+   }
+
+   .tk-password-toggle, .tk-select-arrow {
+       position: absolute;
+       right: 1rem;
+       background: none;
+       border: none;
+       color: var(--tk-text-tertiary);
+       padding: 0.5rem;
+       font-size: 1.1rem;
+       transition: color var(--tk-transition-fast);
+       pointer-events: none; /* Only for arrow */
+   }
+   .tk-password-toggle { cursor: pointer; pointer-events: auto; }
+   .tk-password-toggle:hover { color: var(--tk-text-primary); }
+
+   /* Gender Radio Custom Styling */
+   .tk-radio-group-wrapper {
+       width: 100%;
+       padding: 1rem 1.25rem 1rem 3.5rem;
+       border: 2px solid transparent;
+       border-radius: 16px;
+       background: var(--tk-surface-input);
+       display: flex;
+       align-items: center;
+       gap: 15px;
+       min-height: 60px;
+       flex-wrap: wrap;
+   }
+
+   .tk-radio-label { font-size: 0.85rem; font-weight: 700; color: var(--tk-text-tertiary); text-transform: uppercase; margin-right: 5px; }
+
+   .tk-radio-option {
+       display: flex; align-items: center; margin-bottom: 0; cursor: pointer;
+       font-size: 0.95rem; font-weight: 500; color: var(--tk-text-secondary); transition: var(--tk-transition-fast);
+   }
+   .tk-radio-option:hover { color: var(--tk-text-primary); }
+   .tk-radio-option input[type="radio"] { position: absolute; opacity: 0; width: 0; height: 0; }
+
+   .tk-radio-custom {
+       width: 18px; height: 18px; border: 2px solid #ddd; border-radius: 50%; margin-right: 6px;
+       position: relative; transition: all var(--tk-transition-fast);
+   }
+   .tk-radio-option input[type="radio"]:focus + .tk-radio-custom { box-shadow: 0 0 0 3px rgba(196, 164, 145, 0.2); }
+   .tk-radio-option input[type="radio"]:checked + .tk-radio-custom { border-color: var(--tk-brand-accent); }
+   .tk-radio-option input[type="radio"]:checked + .tk-radio-custom::after {
+       content: ''; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+       width: 10px; height: 10px; border-radius: 50%; background: var(--tk-brand-accent);
+   }
+
+   /* --- UNIQUE CHIP PASSWORD VALIDATION --- */
+   .password-criteria-wrapper {
+       display: none;
+       background: var(--tk-surface-main);
+       border-radius: 16px;
+       padding: 1rem;
+       margin-top: -0.5rem;
+       margin-bottom: 1.5rem;
+       box-shadow: var(--tk-shadow-sm);
+       border: 1px solid #eaeaea;
+       animation: dropIn 0.3s ease forwards;
+       transform-origin: top center;
+   }
+   @keyframes dropIn {
+       from { opacity: 0; transform: scaleY(0.8) translateY(-10px); }
+       to { opacity: 1; transform: scaleY(1) translateY(0); }
+   }
+   .pw-progress-bar { height: 6px; background: #f1f2f6; border-radius: 10px; margin-bottom: 12px; overflow: hidden; }
+   .pw-progress-fill { height: 100%; width: 0%; background: #ff4757; border-radius: 10px; transition: width 0.4s ease, background-color 0.4s ease; }
+   .password-criteria { list-style: none; padding: 0; margin: 0; display: flex; flex-wrap: wrap; gap: 8px; }
+   .password-criteria li { font-size: 0.7rem; font-weight: 600; padding: 4px 10px; border-radius: 20px; background: #f8f9fa; color: #a4b0be; display: flex; align-items: center; transition: all 0.3s ease; border: 1px solid transparent; }
+   .password-criteria li.invalid { background: rgba(255, 71, 87, 0.05); color: #ff4757; border-color: rgba(255, 71, 87, 0.15); }
+   .password-criteria li.valid { background: rgba(46, 213, 115, 0.1); color: #2ed573; border-color: rgba(46, 213, 115, 0.3); transform: scale(1.05); }
+   .password-criteria li span { margin-right: 4px; font-size: 0.65rem; }
+
+   /* Buttons */
+   .tk-btn-primary {
+       width: 100%;
+       padding: 1.1rem;
+       border-radius: 16px;
+       background: var(--tk-brand);
+       color: white;
+       border: none;
+       font-size: 1rem;
+       font-weight: 600;
+       display: flex;
+       align-items: center;
+       justify-content: center;
+       gap: 0.75rem;
+       cursor: pointer;
+       transition: all var(--tk-transition-smooth);
+       box-shadow: 0 8px 20px rgba(17, 17, 17, 0.2);
+       margin-top: 1rem;
+   }
+
+   .tk-btn-primary i { transition: transform var(--tk-transition-smooth); }
+   .tk-btn-primary:hover { transform: translateY(-2px); box-shadow: 0 12px 28px rgba(17, 17, 17, 0.3); }
+   .tk-btn-primary:hover i { transform: translateX(4px); }
+
+   /* Social Login */
+   .tk-divider { text-align: center; margin: 2rem 0 1.5rem; position: relative; }
+   .tk-divider::before { content: ''; position: absolute; top: 50%; left: 0; right: 0; height: 1px; background: #eaeaea; z-index: 1; }
+   .tk-divider span { position: relative; z-index: 2; background: transparent; padding: 0 1rem; font-size: 0.85rem; color: var(--tk-text-tertiary); }
+   .tk-social-logins { display: flex; justify-content: center; gap: 1rem; margin-bottom: 2rem; }
+
+   .tk-btn-social {
+       width: 50px; height: 50px; border-radius: 14px; background: var(--tk-surface-main); border: 1px solid #eaeaea;
+       color: var(--tk-text-primary) !important; display: flex; align-items: center; justify-content: center;
+       font-size: 1.2rem; text-decoration: none; transition: all var(--tk-transition-fast); box-shadow: var(--tk-shadow-sm);
+   }
+   .tk-btn-social:hover { border-color: var(--tk-brand); transform: translateY(-2px); box-shadow: var(--tk-shadow-md); }
+
+   .tk-register-prompt { text-align: center; font-size: 0.95rem; color: var(--tk-text-secondary); margin: 0; }
+   .tk-register-link { color: var(--tk-brand-accent); font-weight: 600; text-decoration: none; }
+   .tk-register-link:hover { text-decoration: underline; }
+
+   /* --- Right Column: Visual Side --- */
+   .tk-login-visual-side {
+       flex: 0.8;
+       background: linear-gradient(135deg, var(--tk-brand-accent-light) 0%, rgba(250, 246, 243, 0.4) 100%);
+       position: relative;
+       display: flex;
+       align-items: center;
+       justify-content: center;
+       padding: 3rem;
+       overflow: hidden;
+       border-left: 1px solid rgba(255,255,255,0.4);
+   }
+
+   .tk-visual-content {
+       display: flex; flex-direction: column; align-items: center; text-align: center; position: relative; z-index: 2; width: 100%;
+   }
+
+   .tk-hero-element { position: relative; width: 250px; height: 250px; margin-bottom: 3rem; }
+   .tk-ring { position: absolute; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
+   .tk-ring-outer { inset: 0; border: 2px dashed rgba(196, 164, 145, 0.6); animation: tk-spin 30s linear infinite; }
+   .tk-ring-inner { inset: 20px; background: var(--tk-surface-main); box-shadow: var(--tk-shadow-md); animation: tk-spin 30s linear infinite reverse; }
+   .tk-ring-inner i { font-size: 3.5rem; background: linear-gradient(135deg, var(--tk-brand-accent), #8c6a58); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+
+   /* Floating Glass Pills */
+   .tk-glass-pill {
+       position: absolute; background: var(--tk-surface-glass); backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.8);
+       padding: 0.75rem 1.25rem; border-radius: 20px; display: flex; align-items: center; gap: 0.75rem; box-shadow: var(--tk-shadow-md); white-space: nowrap;
+   }
+   .tk-float-left { bottom: 10%; left: -25%; animation: tk-float-y 6s ease-in-out infinite; }
+   .tk-float-right { top: 15%; right: -20%; animation: tk-float-y 5s ease-in-out infinite reverse; }
+
+   .tk-pill-icon { width: 32px; height: 32px; background: var(--tk-brand-accent-light); color: var(--tk-brand); border-radius: 50%; display: flex; align-items: center; justify-content: center; }
+   .tk-progress-ring { width: 36px; height: 36px; border-radius: 50%; background: conic-gradient(var(--tk-brand-accent) 100%, #eee 0); display: flex; align-items: center; justify-content: center; }
+   .tk-progress-ring span { width: 28px; height: 28px; background: #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.6rem; font-weight: 700; color: var(--tk-brand-accent); }
+
+   .tk-pill-text { display: flex; flex-direction: column; text-align: left; }
+   .tk-pill-text strong { font-size: 0.85rem; color: var(--tk-text-primary); }
+   .tk-pill-text span { font-size: 0.7rem; color: var(--tk-text-secondary); }
+
+   .tk-visual-text h3 { font-family: 'Jost', system-ui, sans-serif; font-size: 1.5rem; font-weight: 400; color: var(--tk-text-primary); line-height: 1.4; max-width: 320px; margin: 0 auto 2rem; }
+   .tk-visual-text h3 span { font-weight: 700; }
+
+   .tk-slider-indicators { display: flex; gap: 6px; justify-content: center; }
+   .tk-dot { width: 6px; height: 6px; border-radius: 50%; background: rgba(0,0,0,0.1); transition: all var(--tk-transition-smooth); }
+   .tk-dot.active { width: 24px; border-radius: 10px; background: var(--tk-brand); }
+
+   /* Animations */
+   @keyframes tk-spin { to { transform: rotate(360deg); } }
+   @keyframes tk-float-y { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-12px); } }
+   @keyframes tk-drift { 0% { transform: translate(0, 0) scale(1); } 100% { transform: translate(5%, 5%) scale(1.05); } }
+
+   /* --- Responsive Breakpoints --- */
+   @media (max-width: 1200px) { .tk-login-form-side { padding: 3rem 2rem; } }
+   @media (max-width: 992px) {
+       .tk-login-card { flex-direction: column; min-height: auto; max-width: 600px; margin: 0 auto; }
+       .tk-login-visual-side { display: none; }
+       .tk-ambient-blob { display: none; }
+       .tk-login-section { padding: 2rem 1rem; }
+   }
+   @media (max-width: 576px) {
+       .tk-login-form-side { padding: 2rem 1.5rem; }
+       .tk-form-header h2 { font-size: 1.75rem; }
+       .tk-radio-group-wrapper { padding-left: 3rem; }
+       .tk-radio-label { display: none; }
+   }
+</style>
+
+<div class="breacrumb-section">
+   <div class="container">
+       <div class="row">
+           <div class="col-lg-12">
+               <div class="breadcrumb-text">
+                   <a href="/index"><i class="fa fa-home"></i> Home</a>
+                   <span>Register</span>
+               </div>
+           </div>
+       </div>
+   </div>
+</div>
+
+<section class="tk-login-section">
+   <div class="tk-ambient-bg">
+       <div class="tk-ambient-blob tk-ambient-blob-1"></div>
+       <div class="tk-ambient-blob tk-ambient-blob-2"></div>
+   </div>
+
+   <div class="container tk-container-relative">
+       <div class="tk-login-card">
+
+           <div class="tk-login-form-side">
+               <div class="tk-form-header">
+                   <h2>Join TownKart.</h2>
+                   <p>Create your account to unlock premium fashion and seamless shopping.</p>
+               </div>
+
+               <form action="/register" method="post" id="register-form" novalidate>
+                   {% csrf_token %}
+
+                   <div class="row">
+                       <div class="col-md-6">
+                           <div class="tk-input-group">
+                               <i class="ti-user tk-input-icon-left"></i>
+                               <input type="text" name="user_name" id="user_name" class="tk-input" placeholder=" " required>
+                               <label for="user_name" class="tk-floating-label">Username</label>
+                           </div>
+                       </div>
+                       <div class="col-md-6">
+                           <div class="tk-input-group">
+                               <i class="ti-email tk-input-icon-left"></i>
+                               <input type="email" name="email" id="email" class="tk-input" placeholder=" " required>
+                               <label for="email" class="tk-floating-label">Email Address</label>
+                           </div>
+                       </div>
+                   </div>
+
+                   <div class="row">
+                       <div class="col-md-12">
+                           <div class="tk-input-group">
+                               <i class="ti-lock tk-input-icon-left"></i>
+                               <input type="password" name="password" id="password-input" class="tk-input" placeholder=" " autocomplete="new-password" required>
+                               <label for="password-input" class="tk-floating-label">Create Password</label>
+                               <button type="button" class="tk-password-toggle" id="togglePassword">
+                                   <i class="icon_lightbulb_alt"></i>
+                               </button>
+                           </div>
+
+                           <div class="password-criteria-wrapper" id="pw-criteria-wrapper">
+                               <div class="pw-progress-bar"><div class="pw-progress-fill" id="pw-progress-fill"></div></div>
+                               <ul class="password-criteria" id="password-criteria">
+                                   <li id="rule-length" class="invalid"><span class="icon">✘</span>8+ Chars</li>
+                                   <li id="rule-upper" class="invalid"><span class="icon">✘</span>Upper (A-Z)</li>
+                                   <li id="rule-lower" class="invalid"><span class="icon">✘</span>Lower (a-z)</li>
+                                   <li id="rule-number" class="invalid"><span class="icon">✘</span>Number (0-9)</li>
+                                   <li id="rule-special" class="invalid"><span class="icon">✘</span>Special (!@#)</li>
+                               </ul>
+                           </div>
+                       </div>
+                   </div>
+
+                   <div class="row">
+                       <div class="col-md-6">
+                           <div class="tk-input-group">
+                               <i class="ti-mobile tk-input-icon-left"></i>
+                               <input type="tel" name="contact_no" id="contact-input" class="tk-input" placeholder=" " pattern="[0-9]{10}" maxlength="10"  required oninput="this.value = this.value.replace(/[^0-9]/g, '');">
+                               <label for="contact-input" class="tk-floating-label">Contact No</label>
+                           </div>
+                       </div>
+                       <div class="col-md-6">
+                           <div class="tk-input-group">
+                               <i class="ti-calendar tk-input-icon-left"></i>
+                               <input type="text" name="dob" id="dob" class="tk-input" placeholder=" " onfocus="(this.type='date')" onblur="if(!this.value)this.type='text'" required>
+                               <label for="dob" class="tk-floating-label">Date of Birth</label>
+                           </div>
+                       </div>
+                   </div>
+
+                   <div class="row">
+                       <div class="col-md-12">
+                           <div class="tk-input-group">
+                               <i class="ti-id-badge tk-input-icon-left"></i>
+                               <div class="tk-radio-group-wrapper">
+                                   <span class="tk-radio-label">Gender:</span>
+                                   <label class="tk-radio-option">
+                                       <input type="radio" name="gender" value="Male" required>
+                                       <span class="tk-radio-custom"></span> Male
+                                   </label>
+                                   <label class="tk-radio-option">
+                                       <input type="radio" name="gender" value="Female" required>
+                                       <span class="tk-radio-custom"></span> Female
+                                   </label>
+                                   <label class="tk-radio-option">
+                                       <input type="radio" name="gender" value="Other" required>
+                                       <span class="tk-radio-custom"></span> Other
+                                   </label>
+                               </div>
+                           </div>
+                       </div>
+                   </div>
+
+                   <div class="row">
+                       <div class="col-md-6">
+                           <div class="tk-input-group">
+                               <i class="ti-location-pin tk-input-icon-left"></i>
+                               <input type="text" name="address" id="address" class="tk-input" placeholder=" " required>
+                               <label for="address" class="tk-floating-label">Address</label>
+                           </div>
+                       </div>
+                       <div class="col-md-6">
+                           <div class="tk-input-group">
+                               <i class="ti-briefcase tk-input-icon-left"></i>
+                               <select name="role" id="role" class="tk-select" required>
+                                   <option value="" disabled selected hidden></option>
+                                   <option value="User">User</option>
+                                   <option value="Shop">Shop</option>
+                               </select>
+                               <label for="role" class="tk-floating-label">Select Role</label>
+                               <i class="ti-angle-down tk-select-arrow"></i>
+                           </div>
+                       </div>
+                   </div>
+
+                   <button type="submit" class="tk-btn-primary">
+                       <span>Create Account</span>
+                       <i class="ti-arrow-right"></i>
+                   </button>
+               </form>
+
+               <div class="tk-divider">
+                   <span>or sign up with</span>
+               </div>
+
+               <div class="tk-social-logins">
+                   <a href="#" class="tk-btn-social" aria-label="Register with Google"><i class="fa fa-google"></i></a>
+                   <a href="#" class="tk-btn-social" aria-label="Register with Apple"><i class="fa fa-apple"></i></a>
+                   <a href="#" class="tk-btn-social" aria-label="Register with Facebook"><i class="fa fa-facebook"></i></a>
+               </div>
+
+               <p class="tk-register-prompt">
+                   Already a member? <a href="/login" class="tk-register-link">Sign in here</a>
+               </p>
+           </div>
+
+           <div class="tk-login-visual-side">
+               <div class="tk-visual-content">
+                   <div class="tk-hero-element">
+                       <div class="tk-ring tk-ring-outer"></div>
+                       <div class="tk-ring tk-ring-inner">
+                           <i class="ti-star"></i>
+                       </div>
+
+                       <div class="tk-glass-pill tk-float-left">
+                           <div class="tk-pill-icon"><i class="ti-gift"></i></div>
+                           <div class="tk-pill-text">
+                               <strong>Welcome Bonus</strong>
+                               <span>Unlock Offers</span>
+                           </div>
+                       </div>
+
+                       <div class="tk-glass-pill tk-float-right">
+                           <div class="tk-progress-ring"><span>100%</span></div>
+                           <div class="tk-pill-text">
+                               <strong>Secure Profile</strong>
+                               <span>Data Protected</span>
+                           </div>
+                       </div>
+                   </div>
+
+                   <div class="tk-visual-text">
+                       <h3>Begin your journey with the ultimate <span>TownKart</span> experience.</h3>
+                   </div>
+
+                   <div class="tk-slider-indicators">
+                       <span class="tk-dot"></span>
+                       <span class="tk-dot active"></span>
+                       <span class="tk-dot"></span>
+                   </div>
+               </div>
+           </div>
+
+       </div>
+   </div>
+</section>
+
+<div class="partner-logo tk-partner-section">
+   <div class="container">
+       <div class="logo-carousel owl-carousel">
+           <div class="logo-item"><div class="tablecell-inner"><img src="{% static 'img/logo-carousel/logo-1.png' %}" alt="Partner 1"></div></div>
+           <div class="logo-item"><div class="tablecell-inner"><img src="{% static 'img/logo-carousel/logo-2.png' %}" alt="Partner 2"></div></div>
+           <div class="logo-item"><div class="tablecell-inner"><img src="{% static 'img/logo-carousel/logo-3.png' %}" alt="Partner 3"></div></div>
+           <div class="logo-item"><div class="tablecell-inner"><img src="{% static 'img/logo-carousel/logo-4.png' %}" alt="Partner 4"></div></div>
+           <div class="logo-item"><div class="tablecell-inner"><img src="{% static 'img/logo-carousel/logo-5.png' %}" alt="Partner 5"></div></div>
+       </div>
+   </div>
+</div>
+
+<script>
+   document.addEventListener('DOMContentLoaded', () => {
+       // --- Password Visibility Toggle ---
+       const togglePasswordBtn = document.getElementById('togglePassword');
+       const passwordInput = document.getElementById('password-input');
+
+       if (togglePasswordBtn && passwordInput) {
+           passwordInput.value = ""; // Clear on reload
+
+           togglePasswordBtn.addEventListener('click', function () {
+               const isPassword = passwordInput.getAttribute('type') === 'password';
+               passwordInput.setAttribute('type', isPassword ? 'text' : 'password');
+
+               const icon = this.querySelector('i');
+               if (isPassword) {
+                   icon.classList.remove('icon_lightbulb_alt');
+                   icon.classList.add('icon_lightbulb');
+                   icon.style.color = 'var(--tk-brand-accent)';
+               } else {
+                   icon.classList.remove('icon_lightbulb');
+                   icon.classList.add('icon_lightbulb_alt');
+                   icon.style.color = 'var(--tk-text-tertiary)';
+               }
+               passwordInput.focus();
+           });
+       }
+
+       // --- Password Validation Logic ---
+       const criteriaWrapper = document.getElementById('pw-criteria-wrapper');
+       const progressFill = document.getElementById('pw-progress-fill');
+       const registerForm = document.getElementById('register-form');
+       const contactInput = document.getElementById('contact-input');
+
+       const rules = {
+           length: document.getElementById('rule-length'),
+           upper: document.getElementById('rule-upper'),
+           lower: document.getElementById('rule-lower'),
+           number: document.getElementById('rule-number'),
+           special: document.getElementById('rule-special')
+       };
+
+       let isPasswordStrong = false;
+
+       function updateRule(element, isValid) {
+           const iconSpan = element.querySelector('.icon');
+           if (isValid) {
+               element.className = 'valid';
+               iconSpan.innerHTML = '✔';
+           } else {
+               element.className = 'invalid';
+               iconSpan.innerHTML = '✘';
+           }
+       }
+
+       if(passwordInput) {
+           passwordInput.addEventListener('input', function() {
+               const val = passwordInput.value;
+
+               if (val.length > 0) { criteriaWrapper.style.display = 'block'; }
+               else { criteriaWrapper.style.display = 'none'; }
+
+               const checks = {
+                   length: val.length >= 8,
+                   upper: /[A-Z]/.test(val),
+                   lower: /[a-z]/.test(val),
+                   number: /[0-9]/.test(val),
+                   special: /[@$!%*?&]/.test(val)
+               };
+
+               updateRule(rules.length, checks.length);
+               updateRule(rules.upper, checks.upper);
+               updateRule(rules.lower, checks.lower);
+               updateRule(rules.number, checks.number);
+               updateRule(rules.special, checks.special);
+
+               let score = 0;
+               if(checks.length) score++;
+               if(checks.upper) score++;
+               if(checks.lower) score++;
+               if(checks.number) score++;
+               if(checks.special) score++;
+
+               let percentage = (score / 5) * 100;
+               progressFill.style.width = percentage + '%';
+
+               if (score <= 2) { progressFill.style.backgroundColor = '#ff4757'; }
+               else if (score <= 4) { progressFill.style.backgroundColor = '#ffa502'; }
+               else { progressFill.style.backgroundColor = '#2ed573'; }
+
+               isPasswordStrong = (score === 5);
+           });
+       }
+
+       // --- Form Submission Validation ---
+       if(registerForm) {
+           registerForm.addEventListener('submit', function(e) {
+               const contactVal = contactInput.value.trim();
+               const contactRegex = /^[0-9]{10}$/;
+
+               if (!contactRegex.test(contactVal)) {
+                   e.preventDefault();
+                   alert("Please enter exactly 10 digits for your contact number.");
+                   contactInput.focus();
+                   return;
+               }
+
+               if (!isPasswordStrong) {
+                   e.preventDefault();
+                   alert("Please ensure your password meets all the security criteria.");
+                   passwordInput.value = "";
+                   passwordInput.focus();
+                   passwordInput.dispatchEvent(new Event('input'));
+               }
+           });
+       }
+   });
+</script>
+
+{% endblock %}

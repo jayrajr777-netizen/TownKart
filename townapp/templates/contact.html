@@ -1,0 +1,220 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block main %}
+
+<style>
+    /* =========================================
+       ULTRA-PREMIUM CONTACT (SAND & BLUSH V2)
+       ========================================= */
+    :root {
+        --bg-blush: #fdfcfb;
+        --bg-sand: #e2d1c3;
+        --bg-sand-dark: #c4a491;
+        --accent: #1a1a1a;
+        --text-dark: #2a2a2a;
+        --text-muted: #888888;
+        --glass-bg: rgba(255, 255, 255, 0.65);
+        --glass-border: rgba(255, 255, 255, 0.9);
+        --shadow-soft: 0 30px 60px rgba(196, 164, 145, 0.15);
+    }
+
+    body {
+        background: radial-gradient(circle at top left, #fdfcfb 0%, #f4eae4 100%);
+        font-family: 'Jost', sans-serif;
+        position: relative;
+        overflow-x: hidden;
+    }
+
+    /* Cinematic Breathing Background Blobs */
+    @keyframes slowBreathe {
+        0%, 100% { transform: translate(0, 0) scale(1) rotate(0deg); opacity: 0.5; }
+        50% { transform: translate(40px, -40px) scale(1.1) rotate(5deg); opacity: 0.8; }
+    }
+    .bg-blob { position: fixed; filter: blur(100px); border-radius: 50%; z-index: -1; animation: slowBreathe 20s infinite ease-in-out; }
+    .blob-1 { width: 500px; height: 500px; background: #fcebe0; top: 10%; left: -10%; }
+    .blob-2 { width: 450px; height: 450px; background: #e0d4cc; bottom: -5%; right: -5%; animation-delay: -10s; }
+
+    /* Breadcrumb */
+    .breadcrumb-3d {
+        background: rgba(255, 255, 255, 0.6); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+        border-radius: 50px; padding: 15px 35px; box-shadow: 0 10px 25px rgba(0,0,0,0.03), inset 0 0 0 1px rgba(255,255,255,0.9);
+        display: inline-block; font-weight: 600; font-size: 13px; margin-bottom: 40px;
+    }
+    .breadcrumb-3d a { color: var(--text-dark); margin-right: 12px; text-decoration: none; transition: 0.3s; }
+    .breadcrumb-3d a:hover { color: var(--bg-sand-dark); }
+    .breadcrumb-3d span { color: var(--bg-sand-dark); }
+
+    /* Frosted Glass Panels */
+    .glass-panel {
+        background: var(--glass-bg); backdrop-filter: blur(40px); -webkit-backdrop-filter: blur(40px);
+        border-radius: 35px; padding: 50px; box-shadow: var(--shadow-soft);
+        border: 1px solid var(--glass-border); position: relative; overflow: hidden; height: 100%;
+    }
+
+    .section-title { font-family: 'Playfair Display', serif; font-size: 2.5rem; font-weight: 800; color: var(--text-dark); margin-bottom: 15px; letter-spacing: -0.5px; }
+    .section-subtitle { color: var(--text-muted); font-size: 16px; margin-bottom: 40px; line-height: 1.6; }
+
+    /* Entrances */
+    @keyframes fadeInUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+    .animate-up { animation: fadeInUp 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) forwards; opacity: 0; }
+    .d-1 { animation-delay: 0.1s; } .d-2 { animation-delay: 0.2s; } .d-3 { animation-delay: 0.3s; }
+
+    /* Contact Info 3D Cards */
+    .contact-card-3d {
+        background: rgba(255,255,255,0.8); border-radius: 25px; padding: 30px; margin-bottom: 20px;
+        display: flex; align-items: center; gap: 20px; box-shadow: 0 15px 35px rgba(0,0,0,0.04);
+        border: 1px solid rgba(255,255,255,1); transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .contact-card-3d:hover { transform: translateX(10px) translateY(-5px); box-shadow: 0 20px 40px rgba(196, 164, 145, 0.2); }
+
+    .contact-icon {
+        width: 60px; height: 60px; border-radius: 50%; background: var(--bg-blush);
+        display: flex; align-items: center; justify-content: center; font-size: 24px; color: var(--bg-sand-dark);
+        box-shadow: inset 0 5px 10px rgba(0,0,0,0.05), 0 10px 20px rgba(196, 164, 145, 0.2);
+    }
+    .contact-info h6 { font-size: 12px; font-weight: 700; text-transform: uppercase; color: var(--text-muted); letter-spacing: 2px; margin-bottom: 5px; }
+    .contact-info p { margin: 0; font-size: 16px; font-weight: 600; color: var(--text-dark); }
+
+    /* Floating Inputs */
+    .input-wrapper { position: relative; margin-bottom: 30px; }
+    .input-label { font-size: 12px; font-weight: 700; text-transform: uppercase; color: var(--text-dark); margin-bottom: 12px; display: block; letter-spacing: 2px; }
+    .custom-input, .custom-textarea {
+        width: 100%; background: rgba(255,255,255,0.7); border: none; border-radius: 16px; padding: 18px 22px;
+        font-size: 15px; font-weight: 500; color: var(--accent); transition: all 0.4s ease;
+        box-shadow: inset 0 2px 5px rgba(0,0,0,0.02); outline: none; position: relative; z-index: 2; font-family: inherit;
+    }
+    .custom-textarea { height: 150px; resize: none; }
+    .input-line {
+        position: absolute; bottom: 0; left: 10%; width: 80%; height: 2px; background: var(--bg-sand-dark);
+        border-radius: 10px; transform: scaleX(0); transition: transform 0.4s ease; z-index: 3; opacity: 0;
+    }
+    .custom-input:focus, .custom-textarea:focus { background: #fff; box-shadow: 0 10px 25px rgba(196, 164, 145, 0.2); transform: translateY(-3px); }
+    .custom-input:focus ~ .input-line, .custom-textarea:focus ~ .input-line { transform: scaleX(1); opacity: 1; left: 0; width: 100%; }
+
+    /* Sweeping Button */
+    .submit-btn {
+        width: 100%; background: var(--accent); color: #fff; padding: 20px; border-radius: 50px;
+        font-size: 15px; font-weight: 700; text-transform: uppercase; letter-spacing: 2px; border: none;
+        transition: all 0.4s; cursor: pointer; position: relative; overflow: hidden; margin-top: 10px;
+    }
+    .submit-btn::after {
+        content: ''; position: absolute; top: 0; left: -100%; width: 50%; height: 100%;
+        background: linear-gradient(to right, transparent, rgba(255,255,255,0.3), transparent);
+        transform: skewX(-20deg); transition: 0.5s;
+    }
+    .submit-btn:hover::after { left: 150%; }
+    .submit-btn:hover { box-shadow: 0 20px 40px rgba(26, 26, 26, 0.3); transform: translateY(-3px); }
+
+    /* Glass Map Container */
+    .map-glass {
+        background: rgba(255, 255, 255, 0.6); backdrop-filter: blur(30px); border-radius: 40px;
+        padding: 15px; box-shadow: var(--shadow-soft); border: 1px solid var(--glass-border);
+        margin-bottom: 60px; height: 500px; position: relative; overflow: hidden;
+    }
+    .map-glass iframe { width: 100%; height: 100%; border-radius: 30px; filter: contrast(1.1) opacity(0.9); transition: 0.5s ease; }
+    .map-glass:hover iframe { filter: contrast(1.2) opacity(1); }
+    .map-pin {
+        position: absolute; top: 50%; left: 50%; transform: translate(-50%, -100%);
+        width: 60px; height: 60px; background: var(--text-dark); border-radius: 50% 50% 50% 0;
+        display: flex; align-items: center; justify-content: center; color: #fff; font-size: 24px;
+        box-shadow: 0 15px 30px rgba(0,0,0,0.3); animation: bouncePin 2s infinite ease-in-out; pointer-events: none;
+    }
+    @keyframes bouncePin { 0%, 100% { transform: translate(-50%, -100%); } 50% { transform: translate(-50%, -120%); } }
+
+</style>
+
+<div class="bg-blob blob-1"></div>
+<div class="bg-blob blob-2"></div>
+
+<div class="container" style="padding-top: 40px; position: relative; z-index: 10;">
+    <div class="breadcrumb-3d animate-up">
+        <a href="/"><i class="fa fa-home me-2"></i>Home</a> <span class="mx-2 text-muted">/</span>
+        <span>Contact Us</span>
+    </div>
+</div>
+
+<section class="contact-section spad" style="padding-bottom: 80px;">
+    <div class="container">
+
+        <div class="row mb-5 animate-up d-1">
+            <div class="col-lg-12">
+               <div class="map-glass">
+    <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d117506.1102008447!2d72.49842416805175!3d23.020243445942468!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x395e848aba5bd449%3A0x4fcedd11614f6516!2sAhmedabad%2C%20Gujarat!5e0!3m2!1sen!2sin!4v1700000000000!5m2!1sen!2sin" frameborder="0" style="border:0;" allowfullscreen="" aria-hidden="false" tabindex="0"></iframe>
+    <div class="map-pin"><i class="fa fa-map-marker" style="transform: rotate(45deg);"></i></div>
+</div>
+            </div>
+        </div>
+
+        <div class="row g-5">
+            <div class="col-lg-5 animate-up d-2">
+                <div class="pe-lg-4">
+                    <h2 class="section-title">Get In Touch.</h2>
+                    <p class="section-subtitle">Have a question about our premium collection or an existing order? We'd love to hear from you.</p>
+
+                    <div class="contact-card-3d">
+                        <div class="contact-icon"><i class="ti-location-pin"></i></div>
+                        <div class="contact-info">
+                            <h6>Visit Us</h6>
+                            <p>TownKart HQ, Ahmedabad</p>
+                        </div>
+                    </div>
+
+                    <div class="contact-card-3d">
+                        <div class="contact-icon"><i class="ti-mobile"></i></div>
+                        <div class="contact-info">
+                            <h6>Call Us</h6>
+                            <p>+91 98765 43210</p>
+                        </div>
+                    </div>
+
+                    <div class="contact-card-3d">
+                        <div class="contact-icon"><i class="ti-email"></i></div>
+                        <div class="contact-info">
+                            <h6>Email Us</h6>
+                            <p>hello@townkart.com</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-7 animate-up d-3">
+                <div class="glass-panel">
+                    <h4 class="form-title" style="font-size: 1.8rem;">Send a Message</h4>
+                    <p class="section-subtitle mb-4">Our styling team will get back to you within 24 hours.</p>
+
+                   <form action="/contact/" method="POST" class="comment-form">
+    {% csrf_token %}
+    <div class="row">
+        <div class="col-md-6">
+            <div class="input-wrapper">
+                <label class="input-label">Your Name</label>
+                <input type="text" name="name" class="custom-input" placeholder="e.g. Rahul Sharma" required>
+                <div class="input-line"></div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="input-wrapper">
+                <label class="input-label">Your Email</label>
+                <input type="email" name="email" class="custom-input" placeholder="hello@example.com" required>
+                <div class="input-line"></div>
+            </div>
+        </div>
+        <div class="col-12">
+            <div class="input-wrapper">
+                <label class="input-label">Your Message</label>
+                <textarea name="message" class="custom-textarea" placeholder="How can we help you today?" required></textarea>
+                <div class="input-line"></div>
+            </div>
+            <button type="submit" class="submit-btn">Send Message <i class="fa fa-paper-plane ms-2"></i></button>
+        </div>
+    </div>
+</form>
+
+                </div>
+            </div>
+        </div>
+
+    </div>
+</section>
+
+{% endblock %}

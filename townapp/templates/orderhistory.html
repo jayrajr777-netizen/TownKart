@@ -1,0 +1,286 @@
+    {% extends 'base.html' %}
+    {% load static %}
+    {% block main %}
+
+    <style>
+        /* =========================================
+           TOWNKART PREMIUM - ORDER HISTORY (3D UI)
+           ========================================= */
+        :root {
+            --bg-blush: #fdfbfb;
+            --bg-sand: #dcbfae;
+            --bg-sand-dark: #c4a491;
+            --text-dark: #1a1a1a;
+            --text-muted: #888888;
+            --gold: #e7ab3c;
+            --3d-shadow: 0 20px 40px rgba(0, 0, 0, 0.08);
+            --3d-shadow-hover: 0 30px 50px rgba(220, 191, 174, 0.4);
+        }
+
+        body {
+            background-color: var(--bg-blush);
+            font-family: 'Jost', sans-serif;
+            overflow-x: hidden;
+        }
+
+        /* --- Animations --- */
+        @keyframes fadeUp {
+            0% { opacity: 0; transform: translateY(40px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes floatBlob {
+            0% { transform: translate(0, 0) scale(1); }
+            33% { transform: translate(30px, -50px) scale(1.1); }
+            66% { transform: translate(-20px, 20px) scale(0.9); }
+            100% { transform: translate(0, 0) scale(1); }
+        }
+        .animate-up { opacity: 0; animation: fadeUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+        .delay-1 { animation-delay: 0.1s; }
+        .delay-2 { animation-delay: 0.2s; }
+
+        /* --- Hero & Breadcrumbs --- */
+        .history-hero {
+            position: relative;
+            padding: 80px 0 40px;
+            text-align: center;
+            overflow: hidden;
+        }
+        .blob-1, .blob-2 {
+            position: absolute;
+            filter: blur(80px);
+            border-radius: 50%;
+            z-index: 0;
+            opacity: 0.6;
+            animation: floatBlob 10s infinite ease-in-out;
+        }
+        .blob-1 { width: 400px; height: 400px; background: var(--bg-sand); top: -10%; left: 15%; }
+        .blob-2 { width: 350px; height: 350px; background: #e0d4cc; bottom: -20%; right: 15%; animation-delay: -5s; }
+
+        .page-title {
+            position: relative;
+            z-index: 2;
+            font-family: 'Playfair Display', serif;
+            font-size: 4rem;
+            font-weight: 700;
+            color: var(--text-dark);
+            letter-spacing: -1px;
+            margin-bottom: 10px;
+        }
+
+        .breadcrumb-3d {
+            background: rgba(255, 255, 255, 0.6);
+            backdrop-filter: blur(15px);
+            border-radius: 50px;
+            padding: 12px 30px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.03), inset 0 0 0 1px rgba(255,255,255,0.8);
+            display: inline-block;
+            font-weight: 500;
+            font-size: 14px;
+            position: relative;
+            z-index: 2;
+        }
+        .breadcrumb-3d a { color: var(--text-dark); margin-right: 10px; transition: 0.3s; text-decoration: none;}
+        .breadcrumb-3d a:hover { color: var(--bg-sand-dark); }
+        .breadcrumb-3d span { color: var(--text-muted); }
+
+        /* --- Glass Table Wrapper --- */
+        .history-glass-wrapper {
+            background: rgba(255, 255, 255, 0.6);
+            backdrop-filter: blur(30px);
+            border-radius: 30px;
+            padding: 40px;
+            box-shadow: var(--3d-shadow), inset 0 0 0 1px rgba(255,255,255,0.8);
+            position: relative;
+            z-index: 5;
+            overflow-x: auto;
+        }
+
+        .premium-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0 15px;
+            min-width: 800px;
+        }
+        .premium-table th {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: var(--text-muted);
+            font-weight: 600;
+            padding: 0 20px 15px;
+            border-bottom: 1px solid rgba(0,0,0,0.05);
+        }
+        .item-row {
+            background: #ffffff;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.02);
+            transition: all 0.3s ease;
+        }
+        .item-row:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.06);
+        }
+        .premium-table td {
+            padding: 20px;
+            vertical-align: middle;
+            font-size: 15px;
+            color: var(--text-dark);
+            border: none;
+        }
+        .premium-table td:first-child { border-top-left-radius: 20px; border-bottom-left-radius: 20px; }
+        .premium-table td:last-child { border-top-right-radius: 20px; border-bottom-right-radius: 20px; }
+
+        .order-id {
+            font-family: 'Playfair Display', serif;
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--text-dark);
+            margin: 0;
+        }
+
+        /* --- Status Pill Badges --- */
+        .status-badge {
+            padding: 6px 15px;
+            border-radius: 50px;
+            font-size: 12px;
+            font-weight: 600;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            display: inline-block;
+        }
+        .status-pending { background: rgba(231, 171, 60, 0.15); color: #d6982b; }
+        .status-delivered { background: #e8f5e9; color: #2e7d32; }
+        .status-cancelled { background: #ffebee; color: #c62828; }
+        .status-processing { background: rgba(196, 164, 145, 0.2); color: var(--text-dark); }
+
+        /* --- Action Buttons (Icons) --- */
+        .action-btn-3d {
+            width: 40px; height: 40px;
+            border-radius: 50%;
+            display: inline-flex; align-items: center; justify-content: center;
+            background: #f8f9fa;
+            color: var(--text-muted);
+            transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            margin: 0 4px;
+            text-decoration: none;
+            box-shadow: 0 5px 10px rgba(0,0,0,0.05);
+            border: 1px solid transparent;
+        }
+        .action-btn-3d.view-btn:hover { background: var(--text-dark); color: #fff; transform: scale(1.15) translateY(-2px); border-color: var(--text-dark); }
+        .action-btn-3d.invoice-btn:hover { background: var(--bg-sand-dark); color: #fff; transform: scale(1.15) translateY(-2px); border-color: var(--bg-sand-dark); }
+
+        /* --- Buttons --- */
+        .btn-super-dark {
+            display: inline-block;
+            background: linear-gradient(45deg, #1a1a1a, #333333);
+            color: #fff !important;
+            padding: 14px 35px;
+            border-radius: 50px;
+            font-size: 12px; font-weight: 600; letter-spacing: 2px; text-transform: uppercase;
+            border: none; cursor: pointer; text-decoration: none;
+            box-shadow: 0 15px 30px rgba(0,0,0,0.15), inset 0 2px 0 rgba(255,255,255,0.2);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .btn-super-dark:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.25);
+        }
+
+        @media (max-width: 768px) {
+            .page-title { font-size: 3rem; }
+        }
+    </style>
+
+    <section class="history-hero">
+        <div class="blob-1"></div>
+        <div class="blob-2"></div>
+        <div class="container relative z-index-2 animate-up">
+            <h1 class="page-title">Order History</h1>
+            <div class="breadcrumb-3d mt-2">
+                <a href="/"><i class="fa fa-home"></i> Home</a> &rsaquo;
+                <a href="/shop">Shop</a> &rsaquo;
+                <span>Orders</span>
+            </div>
+        </div>
+    </section>
+
+    <section class="shopping-cart pb-5 relative z-index-5">
+        <div class="container">
+
+            <div class="history-glass-wrapper animate-up delay-1">
+                <table class="premium-table">
+                    <thead>
+                        <tr>
+                            <th>Order ID</th>
+                            <th>Purchase Date</th>
+                            <th>Status</th>
+                            <th>Total Amount</th>
+                            <th class="text-center">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for order in orders %}
+                        <tr class="item-row">
+                            <td><h5 class="order-id">#ORD-{{ order.id }}</h5></td>
+
+                            <td style="color: var(--text-muted); font-weight: 500;">{{ order.order_date|date:"M d, Y" }}</td>
+
+                            <td>
+                                {% if order.status == 'Pending' %}
+                                    <span class="status-badge status-pending">{{ order.status }}</span>
+                                {% elif order.status == 'Delivered' %}
+                                    <span class="status-badge status-delivered">{{ order.status }}</span>
+                                {% elif order.status == 'Cancelled' %}
+                                    <span class="status-badge status-cancelled">{{ order.status }}</span>
+                                {% else %}
+                                    <span class="status-badge status-processing">{{ order.status }}</span>
+                                {% endif %}
+                            </td>
+
+                            <td style="font-weight: 700; color: var(--text-dark);">Rs. {{ order.total_amount }}</td>
+
+                            <td class="text-center">
+                                <div class="d-flex justify-content-center align-items-center">
+                                    <a href="/orderdetails/{{order.id}}" class="action-btn-3d view-btn" title="View Details">
+                                        <i class="fa fa-eye"></i>
+                                    </a>
+                                    <a href="/invoice/{{order.id}}" class="action-btn-3d invoice-btn" title="Download Invoice">
+                                        <i class="fa fa-file-text-o"></i>
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="5" class="text-center py-5">
+                                <i class="fa fa-shopping-bag mb-3" style="font-size: 40px; color: #ccc;"></i>
+                                <p style="color: var(--text-muted); font-size: 16px; margin-bottom: 25px;">You haven't placed any orders yet!</p>
+                                <a href="/shop" class="btn-super-dark">Start Shopping</a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            {% if orders %}
+            <div class="row mt-5 animate-up delay-2">
+                <div class="col-lg-12 text-center">
+                    <a href="/shop" style="font-family: 'Jost', sans-serif; font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 2px; text-decoration: none; transition: 0.3s;" onmouseover="this.style.color='#111'" onmouseout="this.style.color='#777'">
+                        <i class="fa fa-arrow-left me-2"></i> Continue Shopping
+                    </a>
+                </div>
+            </div>
+            {% endif %}
+
+        </div>
+    </section>
+
+    <div class="container mb-5 pb-5 opacity-50 text-center animate-up delay-2" style="border-top: 1px solid rgba(0,0,0,0.05); padding-top: 50px;">
+        <span style="font-family: 'Jost', sans-serif; font-size: 10px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 2px; display: block; margin-bottom: 20px;">Trusted Courier Partners</span>
+        <img src="{% static 'img/logo-carousel/logo-1.png' %}" class="mx-4" style="max-width: 90px; filter: grayscale(100%); transition: 0.3s;" onmouseover="this.style.filter='none'" onmouseout="this.style.filter='grayscale(100%)'">
+        <img src="{% static 'img/logo-carousel/logo-2.png' %}" class="mx-4" style="max-width: 90px; filter: grayscale(100%); transition: 0.3s;" onmouseover="this.style.filter='none'" onmouseout="this.style.filter='grayscale(100%)'">
+        <img src="{% static 'img/logo-carousel/logo-3.png' %}" class="mx-4" style="max-width: 90px; filter: grayscale(100%); transition: 0.3s;" onmouseover="this.style.filter='none'" onmouseout="this.style.filter='grayscale(100%)'">
+        <img src="{% static 'img/logo-carousel/logo-4.png' %}" class="mx-4 d-none d-md-inline" style="max-width: 90px; filter: grayscale(100%); transition: 0.3s;" onmouseover="this.style.filter='none'" onmouseout="this.style.filter='grayscale(100%)'">
+    </div>
+
+    {% endblock %}

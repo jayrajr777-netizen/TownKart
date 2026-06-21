@@ -1,0 +1,665 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block main %}
+
+<style>
+    /* =========================================
+       ULTRA-PREMIUM THEME (SAND & BLUSH V3 - LUXURY EDITION)
+       ========================================= */
+    :root {
+        --bg-blush: #fdfcfb;
+        --bg-sand: #e2d1c3;
+        --bg-sand-dark: #c4a491;
+        --gradient-gold: linear-gradient(135deg, #c4a491 0%, #e8c3a9 50%, #c4a491 100%);
+        --accent: #1a1a1a;
+        --text-dark: #2a2a2a;
+        --text-muted: #888888;
+        --success: #2e7d32;
+        --danger: #d9534f;
+        --glass-bg: rgba(255, 255, 255, 0.65);
+        --glass-border: rgba(255, 255, 255, 0.9);
+        --shadow-soft: 0 30px 60px rgba(196, 164, 145, 0.2);
+    }
+
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar { width: 10px; }
+    ::-webkit-scrollbar-track { background: var(--bg-blush); }
+    ::-webkit-scrollbar-thumb { background: var(--bg-sand-dark); border-radius: 10px; }
+    ::-webkit-scrollbar-thumb:hover { background: var(--accent); }
+
+    body {
+        background: radial-gradient(circle at top left, #fdfcfb 0%, #f4eae4 100%);
+        font-family: 'Jost', sans-serif;
+        position: relative;
+        overflow-x: hidden;
+        min-height: 100vh;
+    }
+
+    /* 1. Cinematic Breathing Background Blobs & Floating Particles */
+    @keyframes slowBreathe {
+        0%, 100% { transform: translate(0, 0) scale(1) rotate(0deg); opacity: 0.6; }
+        50% { transform: translate(40px, -40px) scale(1.1) rotate(10deg); opacity: 0.8; }
+    }
+    .bg-blob { position: fixed; filter: blur(100px); border-radius: 50%; z-index: -2; animation: slowBreathe 20s infinite ease-in-out alternate; }
+    .blob-1 { width: 550px; height: 550px; background: #fcebe0; top: -15%; left: -10%; }
+    .blob-2 { width: 450px; height: 450px; background: #e0d4cc; bottom: -10%; right: -5%; animation-delay: -7s; }
+    .blob-3 { width: 350px; height: 350px; background: #fff5f0; top: 35%; left: 35%; animation-delay: -4s; }
+
+    /* Magic Particles */
+    .particle {
+        position: fixed; background: white; border-radius: 50%; z-index: -1;
+        box-shadow: 0 0 10px rgba(255,255,255,0.8);
+        animation: floatUp 15s linear infinite; opacity: 0.5;
+    }
+    @keyframes floatUp {
+        0% { transform: translateY(100vh) scale(0); opacity: 0; }
+        50% { opacity: 0.8; }
+        100% { transform: translateY(-10vh) scale(1); opacity: 0; }
+    }
+
+    /* 2. Frosted Glass Panels with Inner Glow */
+    .glass-panel {
+        background: var(--glass-bg);
+        backdrop-filter: blur(40px); -webkit-backdrop-filter: blur(40px);
+        border-radius: 35px; padding: 50px; margin-bottom: 40px;
+        box-shadow: var(--shadow-soft);
+        border: 1px solid var(--glass-border);
+        box-shadow: inset 0 0 20px rgba(255,255,255,0.7), 0 35px 70px rgba(0,0,0,0.08);
+        position: relative; overflow: hidden;
+    }
+
+    /* Dynamic Form Progress Bar */
+    .form-progress-container {
+        position: absolute; top: 0; left: 0; width: 100%; height: 5px;
+        background: rgba(0,0,0,0.05); z-index: 10;
+    }
+    .form-progress-bar {
+        height: 100%; width: 0%;
+        background: var(--gradient-gold);
+        background-size: 200% auto;
+        transition: width 0.4s ease;
+        animation: shineGradient 3s linear infinite;
+    }
+    @keyframes shineGradient { to { background-position: 200% center; } }
+
+    /* 3. Typography & Gradient Headers */
+    .form-title {
+        font-family: 'Playfair Display', serif; font-size: 2.8rem; font-weight: 800;
+        margin-bottom: 10px; letter-spacing: -0.5px;
+        background: var(--gradient-gold);
+        -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+        background-size: 200% auto; animation: shineGradient 5s linear infinite;
+    }
+    .form-subtitle { color: var(--text-muted); font-size: 16px; margin-bottom: 40px; border-bottom: 1px solid rgba(0,0,0,0.05); padding-bottom: 25px; line-height: 1.6; }
+
+    /* Entrances */
+    @keyframes fadeInUp { from { opacity: 0; transform: translateY(40px); } to { opacity: 1; transform: translateY(0); } }
+    .animate-up { animation: fadeInUp 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) forwards; opacity: 0; }
+    .d-1 { animation-delay: 0.1s; } .d-2 { animation-delay: 0.2s; } .d-3 { animation-delay: 0.3s; } .d-4 { animation-delay: 0.4s; } .d-5 { animation-delay: 0.5s; }
+
+    /* 4. Highly Creative Floating Inputs */
+    .input-wrapper { position: relative; margin-bottom: 30px; }
+    .input-label { font-size: 12px; font-weight: 700; text-transform: uppercase; color: var(--text-dark); margin-bottom: 12px; display: block; letter-spacing: 2px; }
+    .input-label span { color: var(--danger); text-shadow: 0 0 5px rgba(217, 83, 79, 0.3); }
+
+    .custom-input, .custom-select, .custom-textarea {
+        width: 100%; background: rgba(255,255,255,0.7); border: 1px solid rgba(255,255,255,0.5);
+        border-radius: 16px; padding: 18px 22px; font-size: 15px; font-weight: 500; color: var(--accent);
+        transition: all 0.4s cubic-bezier(0.2, 0.8, 0.2, 1); box-shadow: inset 0 2px 5px rgba(0,0,0,0.02);
+        outline: none; font-family: inherit; position: relative; z-index: 2;
+    }
+    .custom-textarea { resize: none; height: 120px; }
+
+    .custom-select {
+        appearance: none;
+        background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%231a1a1a' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+        background-repeat: no-repeat; background-position: right 20px center; background-size: 16px;
+        cursor: pointer; height: 58px; padding-top: 0; padding-bottom: 0; line-height: 58px;
+    }
+
+    /* Glowing Liquid Underline Animation */
+    .input-line {
+        position: absolute; bottom: 0; left: 10%; width: 80%; height: 3px;
+        background: var(--gradient-gold); border-radius: 10px;
+        transform: scaleX(0); transition: transform 0.5s cubic-bezier(0.2, 0.8, 0.2, 1);
+        z-index: 3; opacity: 0; box-shadow: 0 0 10px rgba(196, 164, 145, 0.5);
+    }
+    .custom-input:focus, .custom-select:focus, .custom-textarea:focus {
+        background: #fff; border-color: transparent;
+        box-shadow: 0 15px 35px rgba(196, 164, 145, 0.25), inset 0 0 0 1px var(--bg-sand-dark);
+        transform: translateY(-3px);
+    }
+    .custom-input:focus ~ .input-line, .custom-select:focus ~ .input-line, .custom-textarea:focus ~ .input-line { transform: scaleX(1); opacity: 1; left: 0; width: 100%; }
+
+    /* Animated Dash Upload Box */
+    .upload-box {
+        border: 2px dashed rgba(196, 164, 145, 0.6); border-radius: 20px; padding: 45px 20px; text-align: center;
+        background: rgba(255,255,255,0.5); cursor: pointer; position: relative; transition: all 0.4s; overflow: hidden;
+    }
+    .upload-box:hover { border-color: var(--bg-sand-dark); background: #fff; box-shadow: 0 20px 40px rgba(196, 164, 145, 0.25); transform: scale(1.03); }
+    .upload-box input[type="file"] { position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; z-index: 10; }
+    .upload-icon { font-size: 50px; color: var(--bg-sand-dark); margin-bottom: 15px; transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+    .upload-box:hover .upload-icon { transform: scale(1.2) translateY(-10px); color: var(--accent); }
+    .upload-placeholder h6 { font-weight: 800; margin: 0; font-size: 16px; color: var(--text-dark); }
+    .upload-placeholder p { font-size: 13px; color: var(--text-muted); margin: 5px 0 0; }
+    #form-img-preview { width: 100%; height: 180px; object-fit: cover; border-radius: 15px; display: none; position: relative; z-index: 5; box-shadow: 0 10px 20px rgba(0,0,0,0.15); }
+
+    /* 5. Shimmering Magnetic Sweeping Button */
+    .submit-btn {
+        width: 100%; background: var(--accent); color: #fff; padding: 22px; border-radius: 50px;
+        font-size: 16px; font-weight: 700; text-transform: uppercase; letter-spacing: 2px; border: none;
+        transition: all 0.4s; cursor: pointer; position: relative; overflow: hidden;
+        box-shadow: 0 10px 30px rgba(26, 26, 26, 0.2);
+    }
+    .submit-btn::before {
+        content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%;
+        background: radial-gradient(circle, rgba(255,255,255,0.2) 0%, transparent 60%);
+        transform: scale(0); transition: transform 0.6s ease-out; opacity: 0;
+    }
+    .submit-btn::after {
+        content: ''; position: absolute; top: 0; left: -100%; width: 50%; height: 100%;
+        background: linear-gradient(to right, transparent, rgba(255,255,255,0.4), transparent);
+        transform: skewX(-20deg); animation: shimmerBtn 4s infinite;
+    }
+    @keyframes shimmerBtn { 0% { left: -100%; } 20% { left: 200%; } 100% { left: 200%; } }
+    .submit-btn:hover { box-shadow: 0 20px 40px rgba(26, 26, 26, 0.4); transform: translateY(-3px); }
+    .submit-btn:hover::before { transform: scale(1); opacity: 1; }
+
+    /* =========================================
+       6. HOLOGRAPHIC LIVE PREVIEW CARD
+       ========================================= */
+    .live-preview-wrapper { position: sticky; top: 120px; perspective: 1500px; z-index: 10; }
+    .preview-card-3d {
+        background: #fff; border-radius: 40px; padding: 20px; text-align: left;
+        box-shadow: 0 35px 70px rgba(0,0,0,0.08); border: 1px solid rgba(255,255,255,1);
+        transform-style: preserve-3d; position: relative; overflow: hidden;
+        transition: border-color 0.3s;
+    }
+
+    /* Holographic Foil Overlay */
+    .preview-card-3d::before {
+        content: ''; position: absolute; inset: 0; z-index: 15; pointer-events: none;
+        background: linear-gradient(115deg, transparent 20%, rgba(255,215,0,0.25) 30%, rgba(255,105,180,0.25) 45%, rgba(0,255,255,0.25) 60%, transparent 70%);
+        mix-blend-mode: color-dodge; opacity: 0; transition: opacity 0.4s, transform 0.1s;
+    }
+    .preview-card-3d:hover::before { opacity: 1; }
+
+    .card-glare {
+        position: absolute; top: -50%; left: -50%; width: 200%; height: 200%;
+        background: linear-gradient(105deg, transparent 20%, rgba(255,255,255,0.9) 25%, transparent 30%);
+        transform: translateX(-100%); z-index: 10; pointer-events: none; transition: transform 0.1s; opacity: 0.7; mix-blend-mode: overlay;
+    }
+
+    .preview-img-wrap {
+        border-radius: 25px; overflow: hidden; aspect-ratio: 3/4; margin-bottom: 25px;
+        background: var(--bg-blush); display: flex; align-items: center; justify-content: center;
+        position: relative; transform: translateZ(50px); box-shadow: 0 25px 50px rgba(0,0,0,0.1);
+    }
+    .preview-img-wrap img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.7s cubic-bezier(0.2, 0.8, 0.2, 1); }
+    .preview-card-3d:hover .preview-img-wrap img { transform: scale(1.12); }
+    .preview-img-wrap i { font-size: 70px; color: #e5e5e5; transition: 0.4s; }
+    .preview-card-3d:hover .preview-img-wrap i { transform: scale(1.15) rotate(8deg); color: var(--bg-sand-dark); }
+
+    .preview-badge { position: absolute; top: 20px; left: 20px; background: rgba(255,255,255,0.95); padding: 8px 18px; border-radius: 50px; font-size: 11px; font-weight: 800; text-transform: uppercase; box-shadow: 0 10px 20px rgba(0,0,0,0.1); display: none; z-index: 2; color: var(--accent); letter-spacing: 1.5px; }
+    .preview-stock { position: absolute; top: 20px; right: 20px; background: rgba(46, 125, 50, 0.95); color: white; padding: 8px 15px; border-radius: 50px; font-size: 11px; font-weight: 700; z-index: 2; display: none; box-shadow: 0 10px 20px rgba(46, 125, 50, 0.25); }
+
+    .preview-info { padding: 5px 15px; transform: translateZ(35px); }
+    .preview-category { font-size: 12px; font-weight: 800; color: var(--bg-sand-dark); text-transform: uppercase; letter-spacing: 2px; margin-bottom: 10px; }
+    .preview-title { font-family: 'Playfair Display', serif; font-weight: 800; font-size: 1.8rem; color: var(--text-dark); margin-bottom: 10px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .preview-desc-text { font-size: 14px; color: var(--text-muted); margin-bottom: 20px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; line-height: 1.6; }
+
+    .preview-footer { display: flex; justify-content: space-between; align-items: center; margin-top: 15px; padding-top: 15px; border-top: 1px dashed rgba(0,0,0,0.1); }
+    .preview-price { font-weight: 800; color: var(--accent); font-size: 1.8rem; }
+    .preview-add-btn { height: 50px; width: 50px; background: var(--accent); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+    .preview-add-btn:hover { background: var(--gradient-gold); transform: scale(1.15) rotate(-10deg); box-shadow: 0 15px 25px rgba(196, 164, 145, 0.5); border: none; }
+    .mock-rating { color: #f5b041; font-size: 13px; margin-bottom: 15px; }
+
+    /* Form UI Animations */
+    @keyframes popIn { 0% { transform: scale(1) translateZ(35px); } 50% { transform: scale(1.08) translateZ(50px); color: var(--bg-sand-dark); } 100% { transform: scale(1) translateZ(35px); } }
+    .anim-pop { animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+    @keyframes fadeTextUp { 0% { opacity: 0; transform: translateY(10px) translateZ(35px); } 100% { opacity: 1; transform: translateY(0) translateZ(35px); } }
+    .anim-fade { animation: fadeTextUp 0.5s ease; }
+    @keyframes imageReveal { from { opacity: 0; transform: scale(0.8) translateZ(50px); filter: blur(15px); } to { opacity: 1; transform: scale(1) translateZ(50px); filter: blur(0); } }
+    .anim-img { animation: imageReveal 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) forwards; }
+
+</style>
+
+<!-- Floating Magic Particles -->
+<div id="particles-container"></div>
+<div class="bg-blob blob-1"></div>
+<div class="bg-blob blob-2"></div>
+<div class="bg-blob blob-3"></div>
+
+<section class="checkout-section spad" style="padding-top: 60px; padding-bottom: 80px;">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-7 col-md-12">
+                <div class="glass-panel animate-up">
+                    <!-- Dynamic Progress Bar -->
+                    <div class="form-progress-container">
+                        <div class="form-progress-bar" id="form-progress"></div>
+                    </div>
+
+                    <h2 class="form-title">Upload Product</h2>
+                    <p class="form-subtitle">Fill in the details below to add a beautiful new item to the TownKart store.</p>
+
+                    <form action="/insertproductdata" method="POST" enctype="multipart/form-data" id="product-form">
+                        {% csrf_token %}
+                        <div class="row">
+                            <div class="col-12 animate-up d-1">
+                                <div class="input-wrapper">
+                                    <label class="input-label" for="name">Product Name <span>*</span></label>
+                                    <input type="text" id="name" name="name" class="custom-input form-req" required placeholder="e.g. Vintage Leather Jacket" maxlength="200">
+                                    <div class="input-line"></div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6 animate-up d-1">
+                                <div class="input-wrapper">
+                                    <label class="input-label" for="category">Category <span>*</span></label>
+                                    <select id="category" name="category" class="custom-select form-req" required>
+                                        <option value="" disabled selected>Select Category</option>
+                                        {% for i in data %}
+                                            <option value="{{ i.id }}">{{ i.name }}</option>
+                                        {% endfor %}
+                                    </select>
+                                    <div class="input-line"></div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6 animate-up d-2">
+                                <div class="input-wrapper">
+                                    <label class="input-label" for="product_type">Condition <span>*</span></label>
+                                    <select id="product_type" name="product_type" class="custom-select form-req" required>
+                                        <option value="" disabled selected>Select Condition</option>
+                                        <option value="New">New Arrival</option>
+                                        <option value="Old">Pre-loved / Second Hand</option>
+                                    </select>
+                                    <div class="input-line"></div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6 animate-up d-2">
+                                <div class="input-wrapper">
+                                    <label class="input-label" for="price">Price (₹) <span>*</span></label>
+                                    <input type="number" id="price" name="price" class="custom-input form-req" placeholder="0.00" required>
+                                    <div class="input-line"></div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6 animate-up d-3">
+                                <div class="input-wrapper">
+                                    <label class="input-label" for="qty">Quantity <span>*</span></label>
+                                    <input type="number" id="qty" name="qty" class="custom-input form-req" placeholder="e.g. 50" required>
+                                    <div class="input-line"></div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6 animate-up d-3">
+                                <div class="input-wrapper">
+                                    <label class="input-label" for="sizes_available">Available Sizes <span style="color:var(--text-muted); text-shadow:none;">(Optional)</span></label>
+                                    <input type="text" id="sizes_available" name="sizes_available" class="custom-input" placeholder="e.g. S, M, L or 7, 8, 9">
+                                    <div class="input-line"></div>
+                                </div>
+                            </div>
+
+                            <div class="col-12 animate-up d-3">
+                                <div class="input-wrapper">
+                                    <label class="input-label" for="description">Short Description <span>*</span></label>
+                                    <textarea id="description" name="description" class="custom-textarea form-req" placeholder="Highlight the best features of this product..." required></textarea>
+                                    <div class="input-line"></div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6 animate-up d-4">
+                                <label class="input-label">Product Image <span>*</span></label>
+                                <div class="upload-box" id="upload-box-hover">
+                                    <div id="upload-placeholder" class="upload-placeholder">
+                                        <i class="fa fa-cloud-upload upload-icon"></i>
+                                        <h6>Click or Drag to Upload</h6>
+                                        <p>JPG, PNG, WEBP (Max 2MB)</p>
+                                    </div>
+                                    <img id="form-img-preview" src="#" alt="Preview">
+                                    <input type="file" id="image" name="image" accept="image/*" class="form-req" required>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6 animate-up d-4">
+                                <div class="input-wrapper" style="margin-top: 30px;">
+                                    <label class="input-label" for="extra_images">Extra Views <span style="color:var(--text-muted); text-shadow:none;">(Optional)</span></label>
+                                    <input type="file" id="extra_images" name="extra_images" multiple accept="image/*" class="custom-input" style="padding:15px;">
+                                    <div class="input-line"></div>
+                                </div>
+                                <div class="input-wrapper" style="margin-top: 20px;">
+                                    <label class="input-label" for="status">Listing Status <span>*</span></label>
+                                    <select id="status" name="status" class="custom-select form-req" required>
+                                        <option value="1">Active / Available</option>
+                                        <option value="2">Draft / Unavailable</option>
+                                    </select>
+                                    <div class="input-line"></div>
+                                </div>
+                            </div>
+
+                            <!-- Premium Sub-product Accordion/Section -->
+                            <div class="col-12 mt-5 animate-up d-5">
+                                <div style="border: 2px dashed rgba(196, 164, 145, 0.4); border-radius: 25px; background: linear-gradient(135deg, rgba(255,255,255,0.7) 0%, rgba(255,255,255,0.3) 100%); padding: 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.03);">
+                                    <div class="d-flex justify-content-between align-items-center mb-4">
+                                        <div>
+                                            <h3 style="font-family: 'Playfair Display', serif; font-size: 1.8rem; font-weight: 800; color: var(--text-dark); margin-bottom: 5px;">Add Variation <span style="font-size: 14px; font-weight: 500; font-family: 'Jost'; color: var(--text-muted);">(Optional)</span></h3>
+                                            <p style="color: var(--text-muted); font-size: 14px; margin-bottom: 0;">Add a different color or size variant here.</p>
+                                        </div>
+                                        <button type="button" id="add-more-sub" class="btn" style="background: var(--accent); color: #fff; border-radius: 50px; padding: 10px 20px; font-weight: 600; box-shadow: 0 5px 15px rgba(26,26,26,0.2); transition: 0.3s;">+ Add More</button>
+                                    </div>
+
+                                    <div id="sub-products-container">
+                                        <div class="sub-product-row row" style="background: #fff; border-radius: 20px; padding: 25px 15px 15px 15px; margin-bottom: 20px; box-shadow: 0 15px 35px rgba(0,0,0,0.04); position: relative; border: 1px solid rgba(0,0,0,0.03);">
+                                            <div class="col-md-6">
+                                                <div class="input-wrapper">
+                                                    <label class="input-label">Sub-Product Name</label>
+                                                    <input type="text" name="sub_name" class="custom-input" placeholder="e.g. Black Variant">
+                                                    <div class="input-line"></div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="input-wrapper">
+                                                    <label class="input-label">Category</label>
+                                                    <select name="sub_category" class="custom-select">
+                                                        <option value="" selected>Same as Main Product</option>
+                                                        {% for i in data %}
+                                                            <option value="{{ i.id }}">{{ i.name }}</option>
+                                                        {% endfor %}
+                                                    </select>
+                                                    <div class="input-line"></div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <div class="input-wrapper">
+                                                    <label class="input-label">Price (₹)</label>
+                                                    <input type="number" name="sub_price" class="custom-input" placeholder="0.00">
+                                                    <div class="input-line"></div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <div class="input-wrapper">
+                                                    <label class="input-label">Quantity</label>
+                                                    <input type="number" name="sub_qty" class="custom-input" placeholder="e.g. 20">
+                                                    <div class="input-line"></div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <div class="input-wrapper">
+                                                    <label class="input-label">Sizes</label>
+                                                    <input type="text" name="sub_sizes_available" class="custom-input" placeholder="e.g. S, M, L">
+                                                    <div class="input-line"></div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="input-wrapper">
+                                                    <label class="input-label">Condition</label>
+                                                    <select name="sub_product_type" class="custom-select">
+                                                        <option value="New">New Arrival</option>
+                                                        <option value="Old">Pre-loved</option>
+                                                    </select>
+                                                    <div class="input-line"></div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="input-wrapper">
+                                                    <label class="input-label">Status</label>
+                                                    <select name="sub_status" class="custom-select">
+                                                        <option value="available">Active / Available</option>
+                                                        <option value="unavailable">Draft / Unavailable</option>
+                                                    </select>
+                                                    <div class="input-line"></div>
+                                                </div>
+                                            </div>
+                                            <div class="col-12">
+                                                <div class="input-wrapper">
+                                                    <label class="input-label">Short Description</label>
+                                                    <textarea name="sub_description" class="custom-textarea" style="height: 80px;" placeholder="Details about this variation..."></textarea>
+                                                    <div class="input-line"></div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="input-wrapper">
+                                                    <label class="input-label">Main Image</label>
+                                                    <input type="file" name="sub_image" accept="image/*" class="custom-input" style="padding: 12px;">
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="input-wrapper">
+                                                    <label class="input-label">Extra Images (Optional)</label>
+                                                    <input type="file" name="sub_extra_images" multiple accept="image/*" class="custom-input" style="padding: 12px;">
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-12 mt-5 animate-up d-5">
+                                <button type="submit" class="submit-btn">
+                                    <span style="position:relative; z-index:2;">Publish Product <i class="fa fa-rocket ms-2"></i></span>
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- HOLOGRAPHIC LIVE PREVIEW -->
+            <div class="col-lg-5 d-none d-lg-block animate-up d-2">
+                <div class="live-preview-wrapper" id="live-preview-card">
+                    <h6 style="font-weight: 800; color: var(--text-muted); margin-bottom: 25px; text-transform: uppercase; letter-spacing: 4px; text-align: center; font-size: 11px;">
+                        <i class="fa fa-eye me-1"></i> Live Store Preview
+                    </h6>
+
+                    <div class="preview-card-3d" id="tilt-card">
+                        <div class="card-glare" id="card-glare"></div>
+
+                        <div class="preview-img-wrap">
+                            <span class="preview-badge" id="prev-badge">New</span>
+                            <span class="preview-stock" id="prev-stock"><i class="fa fa-check-circle me-1"></i> In Stock</span>
+                            <i class="fa fa-cube" id="prev-icon"></i>
+                            <img id="prev-img" src="#" alt="Live Preview" style="display: none;">
+                        </div>
+                        <div class="preview-info">
+                            <div class="preview-category" id="prev-category">Category</div>
+                            <div class="preview-title" id="prev-name">Your Product Name</div>
+                            <div class="mock-rating">
+                                <i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star-half-o"></i> <span style="color: #bbb; font-size: 11px;">(0 Reviews)</span>
+                            </div>
+                            <div class="preview-desc-text" id="prev-desc">Your product description will appear here. Make it catchy to attract buyers!</div>
+
+                            <div class="preview-footer">
+                                <div class="preview-price" id="prev-price">₹ 0.00</div>
+                                <div class="preview-add-btn">
+                                    <i class="fa fa-shopping-bag"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+</section>
+
+<script>
+    // --- 1. Background Magic Particles ---
+    const particleContainer = document.getElementById('particles-container');
+    for(let i=0; i<15; i++) {
+        let p = document.createElement('div');
+        p.className = 'particle';
+        let size = Math.random() * 6 + 2;
+        p.style.width = size + 'px'; p.style.height = size + 'px';
+        p.style.left = Math.random() * 100 + 'vw';
+        p.style.animationDelay = (Math.random() * 15) + 's';
+        p.style.animationDuration = (Math.random() * 10 + 10) + 's';
+        particleContainer.appendChild(p);
+    }
+
+    // --- 2. Dynamic Form Progress Bar ---
+    const requiredInputs = document.querySelectorAll('.form-req');
+    const progressBar = document.getElementById('form-progress');
+    function updateProgress() {
+        let filled = 0;
+        requiredInputs.forEach(input => {
+            if(input.value.trim() !== '') filled++;
+        });
+        let percentage = (filled / requiredInputs.length) * 100;
+        progressBar.style.width = percentage + '%';
+        if(percentage === 100) progressBar.style.background = '#2e7d32'; // Turns green when full
+        else progressBar.style.background = 'var(--gradient-gold)';
+    }
+    requiredInputs.forEach(input => {
+        input.addEventListener('input', updateProgress);
+        input.addEventListener('change', updateProgress);
+    });
+
+    // --- 3. Multiple Sub-Product Clone Logic ---
+    let subIdx = 1;
+    document.getElementById('add-more-sub').addEventListener('click', function() {
+        subIdx++;
+        const container = document.getElementById('sub-products-container');
+        const firstRow = container.querySelector('.sub-product-row');
+        const clone = firstRow.cloneNode(true);
+
+        clone.querySelectorAll('input, select, textarea').forEach(function(input) {
+            const originalName = input.getAttribute('name');
+            if (originalName) {
+                const baseName = originalName.replace(/_\d+$/, '');
+                input.setAttribute('name', baseName + '_' + subIdx);
+                if((input.tagName === 'INPUT' && input.type !== 'radio' && input.type !== 'checkbox') || input.tagName === 'TEXTAREA') {
+                    input.value = '';
+                }
+            }
+        });
+
+        const removeDiv = document.createElement('div');
+        removeDiv.className = 'col-12 mt-3 text-end border-top pt-3';
+        removeDiv.innerHTML = '<button type="button" class="btn btn-sm" onclick="this.parentElement.parentElement.remove()" style="background: var(--danger); color: white; border-radius: 50px; padding: 8px 15px; box-shadow: 0 4px 10px rgba(217, 83, 79, 0.3);">Remove Variation <i class="fa fa-trash ms-1"></i></button>';
+        clone.appendChild(removeDiv);
+        container.appendChild(clone);
+    });
+
+    // --- 4. Holographic 3D CARD TILT ---
+    const card = document.getElementById('tilt-card');
+    const prevImg = document.getElementById('prev-img');
+    const glare = document.getElementById('card-glare');
+
+    card.addEventListener('mousemove', (e) => {
+        const rect = card.getBoundingClientRect();
+        const x = e.clientX - rect.left; const y = e.clientY - rect.top;
+        const centerX = rect.width / 2; const centerY = rect.height / 2;
+
+        const rotateX = ((y - centerY) / centerY) * -15; // Increased tilt
+        const rotateY = ((x - centerX) / centerX) * 15;
+
+        card.style.transform = `perspective(1500px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) translateY(-10px) scale3d(1.02, 1.02, 1.02)`;
+        card.style.boxShadow = `${-rotateY * 3}px ${rotateX * 3 + 40}px 70px rgba(196, 164, 145, 0.4)`;
+
+        const glareX = (x / rect.width) * 100;
+        glare.style.transform = `translateX(${glareX - 100}%)`;
+
+        // Holographic foil angle change
+        card.style.setProperty('--bg-angle', `${(x / rect.width) * 360}deg`);
+
+        const moveX = ((x - centerX) / centerX) * -12; const moveY = ((y - centerY) / centerY) * -12;
+        prevImg.style.transform = `scale(1.15) translate(${moveX}px, ${moveY}px)`;
+    });
+
+    card.addEventListener('mouseleave', () => {
+        card.style.transform = `perspective(1500px) rotateX(0deg) rotateY(0deg) translateY(0) scale3d(1, 1, 1)`;
+        card.style.boxShadow = `0 35px 70px rgba(0,0,0,0.08)`;
+        glare.style.transform = `translateX(-100%)`;
+        prevImg.style.transform = `scale(1) translate(0px, 0px)`;
+    });
+
+    // --- 5. Magnetic Button Effect ---
+    const submitBtn = document.querySelector('.submit-btn');
+    submitBtn.addEventListener('mousemove', (e) => {
+        const rect = submitBtn.getBoundingClientRect();
+        const x = e.clientX - rect.left - rect.width / 2;
+        const y = e.clientY - rect.top - rect.height / 2;
+        submitBtn.style.transform = `translate(${x * 0.2}px, ${y * 0.2}px) scale(1.02)`;
+    });
+    submitBtn.addEventListener('mouseleave', () => { submitBtn.style.transform = `translate(0px, 0px) scale(1)`; });
+
+    // --- 6. Form UI Data Binding Animations ---
+    function triggerAnim(element, className) {
+        element.classList.remove(className);
+        void element.offsetWidth;
+        element.classList.add(className);
+    }
+
+    document.getElementById('name').addEventListener('input', function(e) {
+        let val = e.target.value;
+        const el = document.getElementById('prev-name');
+        el.innerText = val ? val : 'Your Product Name';
+        triggerAnim(el, 'anim-pop');
+    });
+
+    document.getElementById('price').addEventListener('input', function(e) {
+        let val = e.target.value;
+        const el = document.getElementById('prev-price');
+        el.innerText = val ? '₹ ' + parseFloat(val).toLocaleString('en-IN') : '₹ 0.00';
+        triggerAnim(el, 'anim-pop');
+    });
+
+    document.getElementById('category').addEventListener('change', function(e) {
+        let selectedText = e.target.options[e.target.selectedIndex].text;
+        const el = document.getElementById('prev-category');
+        el.innerText = selectedText;
+        triggerAnim(el, 'anim-pop');
+    });
+
+    document.getElementById('description').addEventListener('input', function(e) {
+        let val = e.target.value;
+        const el = document.getElementById('prev-desc');
+        el.innerText = val ? val : 'Your product description will appear here. Make it catchy to attract buyers!';
+        triggerAnim(el, 'anim-fade');
+    });
+
+    document.getElementById('product_type').addEventListener('change', function(e) {
+        let badge = document.getElementById('prev-badge');
+        if(e.target.value === 'New') {
+            badge.innerText = 'New Arrival'; badge.style.display = 'block'; triggerAnim(badge, 'anim-pop');
+        } else if(e.target.value === 'Old') {
+            badge.innerText = 'Pre-Loved'; badge.style.display = 'block'; triggerAnim(badge, 'anim-pop');
+        } else { badge.style.display = 'none'; }
+    });
+
+    document.getElementById('qty').addEventListener('input', function(e) {
+        let stockBadge = document.getElementById('prev-stock');
+        let qty = parseInt(e.target.value);
+        if (qty > 0) {
+            stockBadge.innerHTML = `<i class="fa fa-check-circle me-1"></i> ${qty} in Stock`; stockBadge.style.display = 'block'; stockBadge.style.background = 'rgba(46, 125, 50, 0.9)'; triggerAnim(stockBadge, 'anim-pop');
+        } else if (qty === 0) {
+            stockBadge.innerHTML = `<i class="fa fa-times-circle me-1"></i> Out of Stock`; stockBadge.style.display = 'block'; stockBadge.style.background = 'rgba(211, 47, 47, 0.9)'; triggerAnim(stockBadge, 'anim-pop');
+        } else { stockBadge.style.display = 'none'; }
+    });
+
+    document.getElementById('image').addEventListener('change', function(event) {
+        const file = event.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                document.getElementById('form-img-preview').src = e.target.result;
+                document.getElementById('form-img-preview').style.display = 'block';
+                document.getElementById('upload-placeholder').style.display = 'none';
+
+                const liveImg = document.getElementById('prev-img');
+                liveImg.src = e.target.result; liveImg.style.display = 'block';
+                document.getElementById('prev-icon').style.display = 'none';
+                triggerAnim(liveImg, 'anim-img');
+            }
+            reader.readAsDataURL(file);
+        }
+    });
+</script>
+
+{% endblock %}

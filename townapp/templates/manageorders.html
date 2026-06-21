@@ -1,0 +1,262 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block main %}
+
+<style>
+    /* =========================================
+       TOWNKART PREMIUM ADMIN - MANAGE ORDERS
+       ========================================= */
+    :root {
+        --bg-blush: #fdfbfb;
+        --bg-sand: #dcbfae;
+        --bg-sand-dark: #c4a491;
+        --text-dark: #1a1a1a;
+        --text-muted: #888888;
+        --gold: #e7ab3c;
+        --3d-shadow: 0 20px 40px rgba(0, 0, 0, 0.08);
+        --3d-shadow-hover: 0 30px 50px rgba(220, 191, 174, 0.4);
+    }
+
+    body {
+        background-color: var(--bg-blush);
+        font-family: 'Jost', sans-serif;
+        overflow-x: hidden;
+    }
+
+    /* --- Animations --- */
+    @keyframes fadeUp {
+        0% { opacity: 0; transform: translateY(40px); }
+        100% { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes floatBlob {
+        0% { transform: translate(0, 0) scale(1); }
+        33% { transform: translate(30px, -50px) scale(1.1); }
+        66% { transform: translate(-20px, 20px) scale(0.9); }
+        100% { transform: translate(0, 0) scale(1); }
+    }
+    .animate-up { opacity: 0; animation: fadeUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+    .delay-1 { animation-delay: 0.1s; }
+    .delay-2 { animation-delay: 0.2s; }
+
+    /* --- Hero & Breadcrumbs --- */
+    .admin-hero {
+        position: relative;
+        padding: 60px 0 40px;
+        overflow: hidden;
+    }
+    .blob-1, .blob-2 {
+        position: absolute;
+        filter: blur(80px);
+        border-radius: 50%;
+        z-index: 0;
+        opacity: 0.5;
+        animation: floatBlob 10s infinite ease-in-out;
+    }
+    .blob-1 { width: 350px; height: 350px; background: var(--bg-sand); top: -20%; left: -5%; }
+    .blob-2 { width: 300px; height: 300px; background: #e0d4cc; bottom: -20%; right: 5%; animation-delay: -5s; }
+
+    .page-title {
+        font-family: 'Playfair Display', serif;
+        font-size: 3rem;
+        font-weight: 700;
+        color: var(--text-dark);
+        letter-spacing: -1px;
+        margin-bottom: 5px;
+    }
+    .page-subtitle { color: var(--text-muted); font-size: 16px; }
+
+    .breadcrumb-3d {
+        background: rgba(255, 255, 255, 0.6);
+        backdrop-filter: blur(15px);
+        border-radius: 50px;
+        padding: 10px 25px;
+        box-shadow: 0 10px 20px rgba(0,0,0,0.03), inset 0 0 0 1px rgba(255,255,255,0.8);
+        display: inline-block;
+        font-weight: 500;
+        font-size: 13px;
+        position: relative;
+        z-index: 2;
+        margin-bottom: 30px;
+    }
+    .breadcrumb-3d a { color: var(--text-dark); margin-right: 10px; transition: 0.3s; text-decoration: none;}
+    .breadcrumb-3d a:hover { color: var(--bg-sand-dark); }
+
+    /* --- Glass Table Wrapper --- */
+    .inventory-glass-wrapper {
+        background: rgba(255, 255, 255, 0.6);
+        backdrop-filter: blur(30px);
+        border-radius: 30px;
+        padding: 40px;
+        box-shadow: var(--3d-shadow), inset 0 0 0 1px rgba(255,255,255,0.8);
+        position: relative;
+        z-index: 5;
+        overflow-x: auto;
+    }
+
+    .premium-table {
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0 15px;
+        min-width: 900px;
+    }
+    .premium-table th {
+        font-size: 11px;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        color: var(--text-muted);
+        font-weight: 600;
+        padding: 0 20px 15px;
+        border-bottom: 1px solid rgba(0,0,0,0.05);
+    }
+    .item-row {
+        background: #ffffff;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.02);
+        transition: all 0.3s ease;
+    }
+    .item-row:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 15px 35px rgba(0,0,0,0.06);
+    }
+    .premium-table td {
+        padding: 20px;
+        vertical-align: middle;
+        font-size: 15px;
+        color: var(--text-dark);
+        border: none;
+    }
+    .premium-table td:first-child { border-top-left-radius: 20px; border-bottom-left-radius: 20px; }
+    .premium-table td:last-child { border-top-right-radius: 20px; border-bottom-right-radius: 20px; }
+
+    .order-id {
+        font-family: 'Playfair Display', serif;
+        font-size: 18px;
+        font-weight: 700;
+        color: var(--text-dark);
+        margin: 0;
+    }
+
+    /* --- Custom Form Elements --- */
+    .status-select {
+        padding: 10px 20px;
+        border-radius: 50px;
+        border: 1px solid rgba(0,0,0,0.08);
+        background: #f8f9fa;
+        font-family: 'Jost', sans-serif;
+        font-size: 13px;
+        font-weight: 500;
+        color: var(--text-dark);
+        outline: none;
+        transition: all 0.3s ease;
+        cursor: pointer;
+        appearance: none;
+        -webkit-appearance: none;
+        background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%231a1a1a%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E");
+        background-repeat: no-repeat;
+        background-position: right 15px top 50%;
+        background-size: 10px auto;
+        min-width: 160px;
+    }
+    .status-select:focus {
+        border-color: var(--bg-sand-dark);
+        box-shadow: 0 0 0 3px rgba(220, 191, 174, 0.2);
+    }
+    .btn-update {
+        background: linear-gradient(45deg, #1a1a1a, #333333);
+        color: #fff;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 50px;
+        font-size: 12px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        cursor: pointer;
+        box-shadow: 0 10px 20px rgba(0,0,0,0.15);
+    }
+    .btn-update:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 15px 25px rgba(0,0,0,0.25);
+    }
+
+
+
+</style>
+
+<section class="admin-hero">
+    <div class="blob-1"></div>
+    <div class="blob-2"></div>
+
+    <div class="container relative z-index-2 animate-up">
+        <div class="breadcrumb-3d">
+            <a href="/"><i class="fa fa-home"></i> Home</a> &rsaquo;
+            <span>Admin</span> &rsaquo;
+            <span style="color: var(--text-muted);">Manage Orders</span>
+        </div>
+
+        <div class="row align-items-end mb-4">
+            <div class="col-lg-12">
+                <h1 class="page-title">Manage Customer Orders</h1>
+                <p class="page-subtitle">Track, process, and fulfill customer requests effortlessly.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="manage-product-section pb-5 relative z-index-5">
+    <div class="container">
+
+        <div class="inventory-glass-wrapper animate-up delay-1">
+            <table class="premium-table">
+                <thead>
+                    <tr>
+                        <th>Order ID</th>
+                        <th>Customer ID</th>
+                        <th>Date</th>
+                        <th>Amount</th>
+                        <th>Update Status</th>
+
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for order in orders %}
+                    <tr class="item-row">
+                        <td><h5 class="order-id">#ORD-{{ order.id }}</h5></td>
+                        <td style="color: var(--text-muted); font-weight: 500;">User: {{ order.user.id }}</td>
+                        <td>{{ order.order_date|date:"M d, Y" }}</td>
+                        <td style="font-weight: 700; color: var(--text-dark);">Rs. {{ order.total_amount }}</td>
+
+                        <td>
+                            <form action="/updateorderstatus" method="POST" style="display: flex; gap: 12px; align-items: center; margin: 0;">
+                                {% csrf_token %}
+                                <input type="hidden" name="order_id" value="{{ order.id }}">
+                                <select name="status" class="status-select">
+                                    <option value="Pending" {% if order.status == 'Pending' %}selected{% endif %}>Pending</option>
+                                    <option value="Processing" {% if order.status == 'Processing' %}selected{% endif %}>Processing</option>
+                                    <option value="Shipped" {% if order.status == 'Shipped' %}selected{% endif %}>Shipped</option>
+                                    <option value="Out for Delivery" {% if order.status == 'Out for Delivery' %}selected{% endif %}>Out for Delivery</option>
+                                    <option value="Delivered" {% if order.status == 'Delivered' %}selected{% endif %}>Delivered</option>
+                                    <option value="Cancelled" {% if order.status == 'Cancelled' %}selected{% endif %}>Cancelled</option>
+                                </select>
+                                <button type="submit" class="btn-update">Save</button>
+                            </form>
+                        </td>
+
+
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="6" class="text-center py-5">
+                            <i class="fa fa-inbox mb-3" style="font-size: 40px; color: #ccc;"></i>
+                            <p style="color: var(--text-muted); font-size: 16px;">No orders received yet. Waiting for your first sale!</p>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+    </div>
+</section>
+
+{% endblock %}

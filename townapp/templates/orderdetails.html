@@ -1,0 +1,152 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block main %}
+
+    <div class="breacrumb-section">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="breadcrumb-text product-more">
+                        <a href="/"><i class="fa fa-home"></i> Home</a>
+                        <a href="/orderhistory">Order History</a>
+                        <span>Order #ORD-{{ order.id }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <section class="shopping-cart spad">
+        <div class="container">
+            <div class="row mb-4">
+                <div class="col-lg-12">
+                    <div style="background: #f8f9fa; padding: 30px; border-radius: 10px; border: 1px solid #e1e1e1;">
+                        <h4 style="font-family: 'Playfair Display', serif; font-weight: 700; margin-bottom: 20px;">
+                            Order Summary
+                        </h4>
+                        <div class="row">
+                            <div class="col-md-3 col-6 mb-3">
+                                <p class="text-muted mb-1">Order ID</p>
+                                <h6>#ORD-{{ order.id }}</h6>
+                            </div>
+                            <div class="col-md-3 col-6 mb-3">
+                                <p class="text-muted mb-1">Date Placed</p>
+                                <h6>{{ order.order_date|date:"M d, Y - h:i A" }}</h6>
+                            </div>
+                            <div class="col-md-3 col-6 mb-3">
+                                <p class="text-muted mb-1">Total Amount</p>
+                                <h6 style="color: #c4a491; font-weight: bold;">Rs. {{ order.total_amount }}</h6>
+                            </div>
+                            <div class="col-md-3 col-6 mb-3">
+                                <p class="text-muted mb-1">Status</p>
+                                <h6>
+                                    {% if order.status == 'Pending' %}
+                                        <span style="color: orange; font-weight: bold;">{{ order.status }}</span>
+                                    {% elif order.status == 'Delivered' %}
+                                        <span style="color: green; font-weight: bold;">{{ order.status }}</span>
+                                    {% elif order.status == 'Cancelled' %}
+                                        <span style="color: red; font-weight: bold;">{{ order.status }}</span>
+                                    {% else %}
+                                        <span style="color: blue; font-weight: bold;">{{ order.status }}</span>
+                                    {% endif %}
+                                </h6>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row mb-5">
+                <div class="col-lg-12">
+                    <div style="background: #ffffff; padding: 30px; border-radius: 10px; border: 1px solid #e1e1e1; box-shadow: 0 5px 15px rgba(0,0,0,0.05);">
+
+
+                        <div class="progress mt-4" style="height: 25px; border-radius: 20px;">
+                            {% if order.status == 'Pending' %}
+                                <div class="progress-bar bg-warning progress-bar-striped progress-bar-animated" role="progressbar" style="width: 25%; color: black; font-weight: bold;">Order Placed (Pending)</div>
+                            {% elif order.status == 'Shipped' %}
+                                <div class="progress-bar bg-info progress-bar-striped progress-bar-animated" role="progressbar" style="width: 60%; font-weight: bold;">On The Way (Shipped)</div>
+                            {% elif order.status == 'Delivered' %}
+                                <div class="progress-bar bg-success" role="progressbar" style="width: 100%; font-weight: bold;">Delivered Successfully</div>
+                            {% elif order.status == 'Cancelled' %}
+                                <div class="progress-bar bg-danger" role="progressbar" style="width: 100%; font-weight: bold;">Order Cancelled</div>
+                            {% else %}
+                                <div class="progress-bar bg-primary" role="progressbar" style="width: 50%; font-weight: bold;">{{ order.status }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="cart-table">
+
+    <!-- ✅ Ahiya mukvu -->
+    <p><b>Total Items:</b> {{ order_items|length }}</p>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Image</th>
+                <th class="p-name">Product Name</th>
+                <th>Price</th>
+                <th>Quantity</th>
+                <th>Total</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            {% for i in order_items %}
+            <tr>
+                <td>
+                    <img src="/media/{{ i.product.image }}" width="80">
+                </td>
+
+                <td>{{ i.product.name }}</td>
+                <td>Rs. {{ i.product.price }}</td>
+                <td>{{ i.quantity }}</td>
+                <td>Rs. {{ i.total_amount }}</td>
+            </tr>
+
+            {% empty %}
+            <tr>
+                <td colspan="5">No items found</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+                    <div class="row mt-4">
+                        <div class="col-lg-12 d-flex justify-content-between">
+                            <div class="cart-buttons">
+                                <a href="/orderhistory" class="primary-btn continue-shop">Back to Order History</a>
+                            </div>
+                            <div class="cart-buttons">
+                                <a href="/shop" class="primary-btn up-cart">Continue Shopping</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <div class="partner-logo">
+        <div class="container">
+            <div class="logo-carousel owl-carousel">
+                <div class="logo-item">
+                    <div class="tablecell-inner">
+                        <img src="{% static 'img/logo-carousel/logo-1.png' %}" alt="">
+                    </div>
+                </div>
+                <div class="logo-item">
+                    <div class="tablecell-inner">
+                        <img src="{% static 'img/logo-carousel/logo-2.png' %}" alt="">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

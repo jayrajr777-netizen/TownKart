@@ -1,0 +1,308 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block main %}
+<style>
+    :root {
+        --bg-blush: #fdfcfb;
+        --bg-sand: #e2d1c3;
+        --bg-sand-dark: #c4a491;
+        --accent: #1a1a1a;
+        --text-dark: #2a2a2a;
+        --text-muted: #888888;
+        --glass-bg: rgba(255, 255, 255, 0.65);
+        --glass-border: rgba(255, 255, 255, 0.9);
+        --shadow-soft: 0 30px 60px rgba(196, 164, 145, 0.15);
+    }
+
+    body {
+        background: radial-gradient(circle at top left, #fdfcfb 0%, #f4eae4 100%);
+        font-family: 'Jost', sans-serif;
+        overflow-x: hidden;
+    }
+
+    /* Ambient Background Blobs */
+    @keyframes floatBlob {
+        0% { transform: translate(0, 0) scale(1); }
+        33% { transform: translate(30px, -50px) scale(1.1); }
+        66% { transform: translate(-20px, 20px) scale(0.9); }
+        100% { transform: translate(0, 0) scale(1); }
+    }
+    .bg-shape {
+        position: absolute; border-radius: 50%; filter: blur(90px); opacity: 0.7; z-index: 0;
+        animation: floatBlob 20s infinite alternate cubic-bezier(0.45, 0.05, 0.55, 0.95);
+    }
+    .shape-1 { width: 500px; height: 500px; background: #ff9a9e; top: -10%; left: -5%; }
+    .shape-2 { width: 600px; height: 600px; background: #a1c4fd; bottom: -15%; right: -5%; }
+
+    /* Glass Panel */
+    .profile-glass-card {
+        position: relative; z-index: 1;
+        background: var(--glass-bg); backdrop-filter: blur(30px); -webkit-backdrop-filter: blur(30px);
+        border: 1px solid var(--glass-border); border-radius: 40px;
+        box-shadow: var(--shadow-soft); padding: 50px; margin-bottom: 40px;
+        animation: slideUpFade 0.8s cubic-bezier(0.165, 0.84, 0.44, 1) forwards;
+    }
+
+    @keyframes slideUpFade {
+        0% { opacity: 0; transform: translateY(30px); }
+        100% { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Profile Header & Image */
+    .profile-header {
+        display: flex; align-items: center; gap: 25px; margin-bottom: 40px; padding-bottom: 30px; border-bottom: 1px solid rgba(0,0,0,0.05);
+    }
+    .profile-avatar-wrap {
+        position: relative; width: 100px; height: 100px;
+    }
+    .profile-avatar {
+        width: 100%; height: 100%; background: var(--accent); color: #fff;
+        border-radius: 50%; display: flex; align-items: center; justify-content: center;
+        font-size: 36px; font-weight: 700; box-shadow: 0 15px 30px rgba(0,0,0,0.1); overflow: hidden;
+    }
+    .profile-avatar img {
+        width: 100%; height: 100%; object-fit: cover;
+    }
+    .upload-btn {
+        position: absolute; bottom: 0; right: 0; background: var(--bg-sand-dark); color: #fff;
+        width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+        cursor: pointer; border: 2px solid #fff; transition: 0.3s;
+    }
+    .upload-btn:hover { background: var(--accent); transform: scale(1.1); }
+    #image-upload { display: none; }
+
+    .profile-header h2 { font-family: 'Playfair Display', serif; font-size: 2.2rem; font-weight: 800; color: var(--text-dark); margin: 0; }
+    .profile-header p { color: var(--text-muted); margin: 0; font-size: 15px; }
+
+    /* Inputs */
+    .input-wrapper { position: relative; margin-bottom: 25px; }
+    .input-label { font-size: 12px; font-weight: 700; text-transform: uppercase; color: var(--text-dark); margin-bottom: 10px; display: block; letter-spacing: 1px; }
+    .custom-input, .custom-select {
+        width: 100%; background: rgba(255,255,255,0.7); border: none; border-radius: 16px; padding: 18px 22px;
+        font-size: 15px; font-weight: 500; color: var(--accent); transition: all 0.4s ease; outline: none;
+    }
+    .custom-input:focus, .custom-select:focus { background: #fff; box-shadow: 0 10px 25px rgba(196, 164, 145, 0.2); transform: translateY(-3px); }
+    .custom-input:read-only { background: rgba(0,0,0,0.02); color: var(--text-muted); cursor: not-allowed; }
+    .section-title { font-family: 'Playfair Display', serif; font-size: 1.8rem; font-weight: 800; margin-bottom: 20px; color: var(--text-dark); }
+
+    /* Button */
+    .submit-btn {
+        width: 100%; background: var(--accent); color: #fff; padding: 20px; border-radius: 50px;
+        font-size: 15px; font-weight: 700; text-transform: uppercase; letter-spacing: 2px; border: none;
+        transition: all 0.4s; cursor: pointer; margin-top: 10px;
+    }
+    .submit-btn:hover { box-shadow: 0 20px 40px rgba(26, 26, 26, 0.3); transform: translateY(-3px); }
+</style>
+
+<div class="breacrumb-section">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="breadcrumb-text">
+                    <a href="/"><i class="fa fa-home"></i> Home</a>
+                    <span>My Profile</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container" style="position: relative; padding-top: 40px; padding-bottom: 80px;">
+    <div class="bg-shape shape-1"></div>
+    <div class="bg-shape shape-2"></div>
+
+    <div class="row justify-content-center">
+        <div class="col-lg-9">
+
+            <div class="profile-glass-card">
+<form action="/update_profile/" method="POST" enctype="multipart/form-data" id="profile-form">                    {% csrf_token %}
+
+                    <div class="profile-header">
+                        <div class="profile-avatar-wrap">
+                            <div class="profile-avatar" id="avatar-preview">
+                                {% if user_data.profile_image %}
+                                    <img src="{{ user_data.profile_image.url }}" alt="Profile">
+                                {% else %}
+                                    {{ user_data.name|make_list|first|upper }}
+                                {% endif %}
+                            </div>
+                            <label for="image-upload" class="upload-btn">
+                                <i class="fa fa-camera"></i>
+                            </label>
+                            <input type="file" id="image-upload" name="profile_image" accept="image/*" onchange="previewImage(event)">
+                        </div>
+                        <div>
+                            <h2>{{ user_data.name }}</h2>
+                            <p>Manage your account, personal information, and address.</p>
+                        </div>
+                    </div>
+
+                    <h4 class="section-title">Personal Information</h4>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="input-wrapper">
+                                <label class="input-label">Full Name</label>
+                                <input type="text" name="user_name" class="custom-input" value="{{ user_data.name }}" required>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="input-wrapper">
+                                <label class="input-label">Email Address (Read Only)</label>
+<input type="email" name="email" class="custom-input" value="{{ user_data.email }}" required>                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="input-wrapper">
+                                <label class="input-label">Contact Number</label>
+<input type="tel" name="contact_no" id="contact_no" class="custom-input" value="{{ user_data.contact_no }}" pattern="[0-9]{10}" maxlength="10" oninput="this.value = this.value.replace(/[^0-9]/g, '');" required>                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="input-wrapper">
+                                <label class="input-label">Date of Birth</label>
+                                <input type="date" name="dob" class="custom-input" value="{{ user_data.dob|date:'Y-m-d' }}">
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="input-wrapper">
+                                <label class="input-label">Gender</label>
+<select name="gender" class="custom-input" id="gender-select" style="display: block;">                                    <option value="" {% if not user_data.gender %}selected{% endif %}>Select Gender</option>
+                                    <option value="Male" {% if user_data.gender == 'Male' %}selected{% endif %}>Male</option>
+                                    <option value="Female" {% if user_data.gender == 'Female' %}selected{% endif %}>Female</option>
+                                    <option value="Other" {% if user_data.gender == 'Other' %}selected{% endif %}>Other</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <h4 class="section-title mt-4">Address Details</h4>
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="input-wrapper">
+                                <label class="input-label">Street Address</label>
+                                <input type="text" name="address" class="custom-input" value="{{ user_data.address|default_if_none:'' }}" placeholder="House No, Street, Landmark">
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="input-wrapper">
+                                <label class="input-label">City</label>
+                                <input type="text" name="city" class="custom-input" value="{{ user_data.city|default_if_none:'' }}" placeholder="City">
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="input-wrapper">
+                                <label class="input-label">State</label>
+                                <input type="text" name="state" class="custom-input" value="{{ user_data.state|default_if_none:'' }}" placeholder="State">
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="input-wrapper">
+                                <label class="input-label">Pincode</label>
+                                <input type="text" name="pincode" class="custom-input" value="{{ user_data.pincode|default_if_none:'' }}" placeholder="e.g. 380001">
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <button type="submit" class="submit-btn">Update Profile</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+            <div class="profile-glass-card" style="animation-delay: 0.2s;">
+                <h4 class="section-title">Change Password</h4>
+                <p style="color: var(--text-muted); margin-bottom: 30px;">Ensure your account is using a long, random password to stay secure.</p>
+
+<form action="/change_password/" method="POST" id="password-form">                    {% csrf_token %}
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="input-wrapper">
+                                <label class="input-label">Current Password</label>
+                                <input type="password" name="old_password" class="custom-input" placeholder="Enter your old password" required>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="input-wrapper">
+                                <label class="input-label">New Password</label>
+<input type="password" name="new_password" id="new_password" class="custom-input" placeholder="New Password" pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[@$!%*?&]).{8,}" title="Password must contain at least 8 characters, including 1 uppercase, 1 lowercase, 1 number, and 1 special character." required>                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="input-wrapper">
+                                <label class="input-label">Confirm New Password</label>
+                                <input type="password" name="confirm_password" class="custom-input" placeholder="Confirm Password" required>
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <button type="submit" class="submit-btn" style="background: var(--bg-sand-dark);">Update Password</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<script>
+    // 1. Live Image Preview Logic (ફોટો સિલેક્ટ કરતા જ તરત બતાવવા માટે)
+    function previewImage(event) {
+        const reader = new FileReader();
+        reader.onload = function() {
+            const output = document.getElementById('avatar-preview');
+            // જૂનો અક્ષર કે ઈમેજ હટાવીને નવી ઈમેજ સેટ કરશે
+            output.innerHTML = `<img src="${reader.result}" alt="Profile Preview" style="width:100%; height:100%; object-fit:cover; border-radius:50%;">`;
+        };
+        // જો યુઝરે ફાઈલ સિલેક્ટ કરી હોય તો તેને રીડ કરો
+        if(event.target.files[0]) {
+            reader.readAsDataURL(event.target.files[0]);
+        }
+    }
+
+    // 2. Gender Select Logic (તમારો જૂનો કોડ)
+    document.addEventListener("DOMContentLoaded", function() {
+        var savedGender = "{{ user_data.gender|default:'' }}";
+
+        if (savedGender !== "None" && savedGender !== "") {
+            var selectBox = document.getElementById('gender-select');
+            selectBox.value = savedGender; // ડ્રોપડાઉનમાં વેલ્યુ સેટ કરો
+
+            if (typeof jQuery !== 'undefined' && jQuery.fn.niceSelect) {
+                jQuery(selectBox).niceSelect('update');
+            }
+        }
+    });
+    // My Profile Form Validation (Contact No)
+    const profileForm = document.getElementById('profile-form');
+    if(profileForm) {
+        profileForm.addEventListener('submit', function(e) {
+            const contactVal = document.getElementById('contact_no').value.trim();
+            if (!/^[0-9]{10}$/.test(contactVal)) {
+                e.preventDefault();
+                alert("Please enter exactly 10 digits for your contact number.");
+                document.getElementById('contact_no').focus();
+            }
+        });
+    }
+
+    // Change Password Validation
+    const passwordForm = document.getElementById('password-form');
+    if(passwordForm) {
+        passwordForm.addEventListener('submit', function(e) {
+            const newPw = document.getElementById('new_password').value;
+            const confirmPw = document.querySelector('input[name="confirm_password"]').value;
+
+            // Password Strength Regex (Register જેવું જ)
+            const strongRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+
+            if (!strongRegex.test(newPw)) {
+                e.preventDefault();
+                alert("Password is too weak! It must be at least 8 characters long and include an uppercase letter, a lowercase letter, a number, and a special character.");
+                return;
+            }
+
+            if (newPw !== confirmPw) {
+                e.preventDefault();
+                alert("New Password and Confirm Password do not match!");
+            }
+        });
+    }
+</script>
+{% endblock %}

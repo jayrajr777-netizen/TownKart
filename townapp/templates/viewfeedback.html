@@ -1,0 +1,437 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block main %}
+
+<style>
+    /* =========================================
+       TOWNKART PREMIUM ADMIN - MANAGE FEEDBACK
+       ========================================= */
+    :root {
+        --bg-blush: #fdfbfb;
+        --bg-sand: #dcbfae;
+        --bg-sand-dark: #c4a491;
+        --text-dark: #1a1a1a;
+        --text-muted: #888888;
+        --gold: #e7ab3c;
+        --3d-shadow: 0 20px 40px rgba(0, 0, 0, 0.08);
+        --3d-shadow-hover: 0 30px 50px rgba(220, 191, 174, 0.4);
+    }
+
+    body {
+        background-color: var(--bg-blush);
+        font-family: 'Jost', sans-serif;
+        overflow-x: hidden;
+    }
+
+    /* --- Animations --- */
+    @keyframes fadeUp {
+        0% { opacity: 0; transform: translateY(40px); }
+        100% { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes floatBlob {
+        0% { transform: translate(0, 0) scale(1); }
+        33% { transform: translate(30px, -50px) scale(1.1); }
+        66% { transform: translate(-20px, 20px) scale(0.9); }
+        100% { transform: translate(0, 0) scale(1); }
+    }
+    .animate-up { opacity: 0; animation: fadeUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+    .delay-1 { animation-delay: 0.1s; }
+    .delay-2 { animation-delay: 0.2s; }
+    .delay-3 { animation-delay: 0.3s; }
+
+    /* --- Hero & Breadcrumbs --- */
+    .admin-hero {
+        position: relative;
+        padding: 60px 0 40px;
+        overflow: hidden;
+    }
+    .blob-1, .blob-2 {
+        position: absolute;
+        filter: blur(80px);
+        border-radius: 50%;
+        z-index: 0;
+        opacity: 0.5;
+        animation: floatBlob 10s infinite ease-in-out;
+    }
+    .blob-1 { width: 350px; height: 350px; background: var(--bg-sand); top: -20%; left: -5%; }
+    .blob-2 { width: 300px; height: 300px; background: #e0d4cc; bottom: -20%; right: 5%; animation-delay: -5s; }
+
+    .page-title {
+        font-family: 'Playfair Display', serif;
+        font-size: 3rem;
+        font-weight: 700;
+        color: var(--text-dark);
+        letter-spacing: -1px;
+        margin-bottom: 5px;
+    }
+    .page-subtitle { color: var(--text-muted); font-size: 16px; }
+
+    .breadcrumb-3d {
+        background: rgba(255, 255, 255, 0.6);
+        backdrop-filter: blur(15px);
+        border-radius: 50px;
+        padding: 10px 25px;
+        box-shadow: 0 10px 20px rgba(0,0,0,0.03), inset 0 0 0 1px rgba(255,255,255,0.8);
+        display: inline-block;
+        font-weight: 500;
+        font-size: 13px;
+        position: relative;
+        z-index: 2;
+        margin-bottom: 30px;
+    }
+    .breadcrumb-3d a { color: var(--text-dark); margin-right: 10px; transition: 0.3s; text-decoration: none;}
+    .breadcrumb-3d a:hover { color: var(--bg-sand-dark); }
+
+    .btn-super-dark {
+        display: inline-block;
+        background: linear-gradient(45deg, #1a1a1a, #333333);
+        color: #fff !important;
+        padding: 14px 30px;
+        border-radius: 50px;
+        font-size: 13px; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase;
+        border: none; cursor: pointer; text-decoration: none;
+        box-shadow: 0 15px 30px rgba(0,0,0,0.15), inset 0 2px 0 rgba(255,255,255,0.2);
+        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+    .btn-super-dark:hover { transform: translateY(-4px); box-shadow: 0 20px 40px rgba(0,0,0,0.25); }
+
+    /* --- Stats & Breakdown Cards (3D) --- */
+    .stat-card-3d {
+        background: #ffffff;
+        border-radius: 30px;
+        padding: 30px;
+        box-shadow: 0 15px 35px rgba(0,0,0,0.04);
+        display: flex;
+        align-items: center;
+        transition: all 0.4s ease;
+        height: 100%;
+        border: 1px solid rgba(255,255,255,0.9);
+        position: relative;
+    }
+    .stat-card-3d:hover {
+        transform: translateY(-10px);
+        box-shadow: var(--3d-shadow-hover);
+    }
+    .stat-icon-wrapper {
+        background: var(--bg-sand);
+        color: #fff;
+        width: 70px;
+        height: 70px;
+        border-radius: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 28px;
+        margin-right: 25px;
+        box-shadow: 0 10px 20px rgba(220, 191, 174, 0.4);
+    }
+    .stat-details h3 { font-family: 'Playfair Display', serif; margin: 0; font-weight: 700; color: var(--text-dark); font-size: 36px; line-height: 1; }
+    .stat-details p { margin: 5px 0 0 0; color: var(--text-muted); font-weight: 600; text-transform: uppercase; font-size: 12px; letter-spacing: 1px; }
+
+    .breakdown-card {
+        background: #fff;
+        border-radius: 30px;
+        padding: 30px;
+        box-shadow: 0 15px 35px rgba(0,0,0,0.04);
+        height: 100%;
+        transition: all 0.4s ease;
+    }
+    .breakdown-card:hover { transform: translateY(-10px); box-shadow: var(--3d-shadow-hover); }
+    .breakdown-row { display: flex; align-items: center; margin-bottom: 12px; }
+    .star-label { width: 60px; font-weight: 600; color: var(--text-dark); font-size: 13px; }
+    .progress-bar-bg {
+        flex-grow: 1; background: #f0f0f0; height: 8px;
+        border-radius: 10px; margin: 0 15px; overflow: hidden;
+    }
+    .progress-fill { height: 100%; border-radius: 10px; }
+    .percent-label { width: 40px; text-align: right; color: var(--text-muted); font-size: 12px; font-weight: 600; }
+
+    /* --- Toolbar & Live Search --- */
+    .table-toolbar {
+        display: flex; justify-content: space-between; align-items: center;
+        background: rgba(255, 255, 255, 0.6); backdrop-filter: blur(20px);
+        padding: 20px 30px; border-radius: 20px; margin-bottom: 25px;
+        box-shadow: 0 10px 20px rgba(0,0,0,0.02);
+        border: 1px solid rgba(255,255,255,0.8);
+    }
+    .search-box { position: relative; width: 350px; }
+    .search-box i { position: absolute; left: 20px; top: 15px; color: var(--text-muted); }
+    .search-box input {
+        width: 100%; padding: 12px 15px 12px 50px;
+        border: none; border-radius: 50px;
+        background: #fff; color: var(--text-dark);
+        font-family: 'Jost', sans-serif; outline: none;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.03); transition: 0.3s;
+    }
+    .search-box input:focus { box-shadow: 0 5px 20px rgba(220, 191, 174, 0.3); }
+
+    /* --- Glass Table Wrapper --- */
+    .inventory-glass-wrapper {
+        background: rgba(255, 255, 255, 0.6);
+        backdrop-filter: blur(30px); border-radius: 30px; padding: 40px;
+        box-shadow: var(--3d-shadow), inset 0 0 0 1px rgba(255,255,255,0.8);
+        position: relative; z-index: 5; overflow-x: auto;
+    }
+
+    .premium-table { width: 100%; border-collapse: separate; border-spacing: 0 15px; min-width: 900px; }
+    .premium-table th { font-size: 11px; text-transform: uppercase; letter-spacing: 2px; color: var(--text-muted); font-weight: 600; padding: 0 20px 15px; border-bottom: 1px solid rgba(0,0,0,0.05); }
+    .item-row { background: #ffffff; box-shadow: 0 5px 15px rgba(0,0,0,0.02); transition: all 0.3s ease; }
+    .item-row:hover { transform: translateY(-5px); box-shadow: 0 15px 35px rgba(0,0,0,0.06); }
+    .premium-table td { padding: 20px; vertical-align: middle; font-size: 15px; color: var(--text-dark); border: none; }
+    .premium-table td:first-child { border-top-left-radius: 20px; border-bottom-left-radius: 20px; }
+    .premium-table td:last-child { border-top-right-radius: 20px; border-bottom-right-radius: 20px; }
+
+    /* Custom Table Elements */
+    .avatar-circle {
+        background: var(--bg-sand); color: #fff; width: 45px; height: 45px;
+        border-radius: 15px; display: flex; align-items: center; justify-content: center;
+        font-size: 18px; box-shadow: 0 5px 10px rgba(220, 191, 174, 0.3);
+    }
+    .customer-name { font-family: 'Playfair Display', serif; font-weight: 700; color: var(--text-dark); margin: 0; font-size: 18px; }
+    .review-text { font-style: italic; color: #666; font-size: 15px; line-height: 1.6; }
+    .status-badge {
+        background: #f8f9fa; color: var(--text-dark); padding: 6px 15px;
+        border-radius: 50px; font-size: 12px; font-weight: 600; letter-spacing: 1px;
+        border: 1px solid rgba(0,0,0,0.05);
+    }
+
+    /* Action Buttons (Icons) */
+    .action-btn-3d {
+        width: 40px; height: 40px; border-radius: 50%;
+        display: inline-flex; align-items: center; justify-content: center;
+        background: #f8f9fa; color: var(--text-muted);
+        transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        text-decoration: none; box-shadow: 0 5px 10px rgba(0,0,0,0.05);
+        border: 1px solid transparent; margin: 0 auto;
+    }
+    .action-btn-3d.delete:hover { background: #dc3545; color: #fff; transform: scale(1.15) translateY(-2px); border-color: #dc3545; }
+
+    @media (max-width: 991px) {
+        .table-toolbar { flex-direction: column; gap: 15px; align-items: flex-start; }
+        .search-box { width: 100%; }
+    }
+</style>
+
+<section class="admin-hero">
+    <div class="blob-1"></div>
+    <div class="blob-2"></div>
+
+    <div class="container relative z-index-2 animate-up">
+        <div class="breadcrumb-3d">
+            <a href="/"><i class="fa fa-home"></i> Home</a> &rsaquo;
+            <span>Admin</span> &rsaquo;
+            <span style="color: var(--text-muted);">Manage Feedback</span>
+        </div>
+
+        <div class="row align-items-end mb-4">
+            <div class="col-lg-8">
+                <h1 class="page-title">TownKart Workspace</h1>
+                <p class="page-subtitle">Monitor customer feedback, ratings, and reviews.</p>
+            </div>
+            <div class="col-lg-4 text-lg-end mt-4 mt-lg-0">
+                <a href="/manageproduct" class="btn-super-dark">
+                    <i class="fa fa-cubes me-2"></i> Manage Products
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<div class="container relative z-index-5 pb-5">
+
+    <div class="row mb-5">
+        <div class="col-lg-4 col-md-6 mb-4 mb-lg-0 animate-up delay-1">
+            <div class="stat-card-3d">
+                <div class="stat-icon-wrapper" style="background: var(--text-dark);"><i class="fa fa-comments-o"></i></div>
+                <div class="stat-details">
+                    <h3>{{ feedbacks.count }}</h3>
+                    <p>Total Reviews</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4 col-md-6 mb-4 mb-lg-0 animate-up delay-2">
+            <div class="stat-card-3d">
+                <div class="stat-icon-wrapper" style="background: var(--bg-sand-dark);"><i class="fa fa-star"></i></div>
+                <div class="stat-details">
+                    <h3 id="avgRatingDisplay">0.0</h3>
+                    <p>Average Rating</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4 col-md-12 animate-up delay-3">
+            <div class="breakdown-card">
+                <h6 style="font-family: 'Playfair Display', serif; font-weight: 700; color: var(--text-dark); margin-bottom: 20px; font-size: 18px;">Rating Distribution</h6>
+                <div class="breakdown-row">
+                    <span class="star-label">5 Stars</span>
+                    <div class="progress-bar-bg"><div id="bar5" class="progress-fill" style="width: 0%; background: var(--bg-sand-dark); transition: width 1s ease;"></div></div>
+                    <span id="text5" class="percent-label">0%</span>
+                </div>
+                <div class="breakdown-row">
+                    <span class="star-label">4 Stars</span>
+                    <div class="progress-bar-bg"><div id="bar4" class="progress-fill" style="width: 0%; background: var(--text-dark); transition: width 1s ease;"></div></div>
+                    <span id="text4" class="percent-label">0%</span>
+                </div>
+                <div class="breakdown-row mb-0">
+                    <span class="star-label">1-3 Stars</span>
+                    <div class="progress-bar-bg"><div id="bar1to3" class="progress-fill" style="width: 0%; background: #dc3545; transition: width 1s ease;"></div></div>
+                    <span id="text1to3" class="percent-label">0%</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row animate-up delay-2">
+        <div class="col-lg-12">
+            <div class="table-toolbar">
+                <h5 class="mb-0" style="font-family: 'Playfair Display', serif; font-weight: 700; color: var(--text-dark); font-size: 22px;">Recent Feedback</h5>
+                <div class="search-box">
+                    <i class="fa fa-search"></i>
+                    <input type="text" id="liveSearchInput" placeholder="Search by customer name...">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row animate-up delay-3">
+        <div class="col-lg-12">
+
+<div class="inventory-glass-wrapper">
+                <table class="premium-table" id="feedbackTable">
+                    <thead>
+                        <tr>
+                            <th>Customer</th>
+                            <th>Rating</th>
+                            <th style="width: 40%;">Review</th>
+                            <th>Status</th>
+                            <th class="text-center">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for review in feedbacks %}
+                        <tr class="item-row review-row">
+                            <td>
+                                <div class="d-flex align-items-center gap-3">
+                                    <div class="avatar-circle"><i class="fa fa-user"></i></div>
+                                    <div>
+                                        <p class="customer-name customer-search-name">{{ review.user.name }}</p>
+                                        <span style="font-size: 12px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px;">Verified Buyer</span>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                <div style="color: var(--gold); font-size: 18px; font-weight: bold; text-shadow: 0 2px 5px rgba(231, 171, 60, 0.2);">
+                                    <span class="rating-val">{{ review.ratings }}</span> <i class="fa fa-star"></i>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="review-text">"{{ review.comment }}"</div>
+                            </td>
+                            <td>
+                                <span class="status-badge">Published</span>
+                            </td>
+                            <td class="text-center">
+                                <a href="/deletefeedback/{{ review.id }}" class="action-btn-3d delete" title="Delete Review" onclick="return confirm('Delete this review?');">
+                                    <i class="fa fa-trash"></i>
+                                </a>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="5" class="text-center py-5">
+                                <i class="fa fa-commenting-o mb-3" style="font-size: 40px; color: #ccc;"></i>
+                                <p style="color: var(--text-muted); font-size: 16px;">No customer feedback has been received yet.</p>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const searchInput = document.getElementById("liveSearchInput");
+        const rows = document.querySelectorAll(".review-row");
+        const avgRatingDisplay = document.getElementById("avgRatingDisplay");
+
+        // --- 1. Calculate Average Rating & Distribution ---
+        let totalRating = 0;
+        let validReviewsCount = 0;
+
+        // Distribution counters
+        let count5 = 0;
+        let count4 = 0;
+        let count1to3 = 0;
+
+        rows.forEach(row => {
+            const ratingElement = row.querySelector('.rating-val');
+            if (ratingElement) {
+                const rating = parseFloat(ratingElement.textContent.trim());
+                if (!isNaN(rating)) {
+                    totalRating += rating;
+                    validReviewsCount++;
+
+                    // Count for distribution
+                    if (rating === 5) {
+                        count5++;
+                    } else if (rating === 4) {
+                        count4++;
+                    } else if (rating >= 1 && rating <= 3) {
+                        count1to3++;
+                    }
+                }
+            }
+        });
+
+        // Display Average and Update Progress Bars
+        if (validReviewsCount > 0) {
+            // Average
+            const average = (totalRating / validReviewsCount).toFixed(1);
+            avgRatingDisplay.textContent = average;
+
+            // Distribution Percentages
+            const pct5 = Math.round((count5 / validReviewsCount) * 100);
+            const pct4 = Math.round((count4 / validReviewsCount) * 100);
+            const pct1to3 = Math.round((count1to3 / validReviewsCount) * 100);
+
+            // Update UI with slight delay for animation effect
+            setTimeout(() => {
+                document.getElementById('bar5').style.width = pct5 + '%';
+                document.getElementById('text5').textContent = pct5 + '%';
+
+                document.getElementById('bar4').style.width = pct4 + '%';
+                document.getElementById('text4').textContent = pct4 + '%';
+
+                document.getElementById('bar1to3').style.width = pct1to3 + '%';
+                document.getElementById('text1to3').textContent = pct1to3 + '%';
+            }, 100);
+
+        } else {
+            avgRatingDisplay.textContent = "0.0";
+        }
+
+        // --- 2. Live Search Logic ---
+        searchInput.addEventListener("input", function(event) {
+            const query = event.target.value.toLowerCase().trim();
+
+            rows.forEach(row => {
+                const nameNode = row.querySelector(".customer-search-name");
+                if (nameNode) {
+                    const name = nameNode.textContent.toLowerCase();
+                    if (name.includes(query)) {
+                        row.style.display = "";
+                    } else {
+                        row.style.display = "none";
+                    }
+                }
+            });
+        });
+    });
+</script>
+
+{% endblock %}

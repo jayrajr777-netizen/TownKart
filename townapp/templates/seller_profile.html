@@ -1,0 +1,112 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block main %}
+<style>
+    /* Premium Glass Theme */
+    :root {
+        --glass-bg: rgba(255, 255, 255, 0.65);
+        --glass-border: rgba(255, 255, 255, 0.9);
+        --shadow-soft: 0 30px 60px rgba(0, 0, 0, 0.08);
+        --accent: #252525;
+        --gold: #e7ab3c;
+    }
+    body { background: radial-gradient(circle at top left, #fdfcfb 0%, #f4eae4 100%); }
+    .seller-glass-card {
+        background: var(--glass-bg); backdrop-filter: blur(30px);
+        border: 1px solid var(--glass-border); border-radius: 30px;
+        box-shadow: var(--shadow-soft); padding: 40px; margin-bottom: 30px;
+    }
+    .profile-header { display: flex; align-items: center; gap: 25px; margin-bottom: 30px; border-bottom: 1px solid rgba(0,0,0,0.05); padding-bottom: 20px;}
+    .profile-avatar { width: 90px; height: 90px; background: var(--accent); color: #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 32px; font-weight: 700; overflow: hidden; position: relative;}
+    .profile-avatar img { width: 100%; height: 100%; object-fit: cover; }
+    .upload-btn { position: absolute; bottom: 0; right: 0; background: var(--gold); color: #fff; width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; border: 2px solid #fff;}
+    #image-upload { display: none; }
+    .custom-input { width: 100%; background: rgba(255,255,255,0.7); border: none; border-radius: 12px; padding: 15px 20px; font-size: 15px; margin-bottom: 20px; outline: none; transition: 0.3s;}
+    .custom-input:focus { background: #fff; box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
+    .submit-btn { width: 100%; background: var(--accent); color: #fff; padding: 15px; border-radius: 50px; font-weight: 700; text-transform: uppercase; border: none; transition: 0.3s;}
+    .submit-btn:hover { background: var(--gold); }
+</style>
+
+<div class="breacrumb-section">
+    <div class="container">
+        <div class="breadcrumb-text">
+            <a href="/"><i class="fa fa-home"></i> Home</a>
+            <span>Seller Profile</span>
+        </div>
+    </div>
+</div>
+
+<div class="container" style="padding-top: 40px; padding-bottom: 80px;">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+<form action="/update_seller_profile/" method="POST" enctype="multipart/form-data" id="seller-form">                {% csrf_token %}
+
+                <div class="seller-glass-card">
+                    <div class="profile-header">
+                        <div style="position: relative;">
+                            <div class="profile-avatar" id="avatar-preview">
+                                {% if user_data.profile_image %}
+                                    <img src="{{ user_data.profile_image.url }}" alt="Profile">
+                                {% else %}
+                                    {{ user_data.name|make_list|first|upper }}
+                                {% endif %}
+                            </div>
+                            <label for="image-upload" class="upload-btn"><i class="fa fa-camera"></i></label>
+                            <input type="file" id="image-upload" name="profile_image" accept="image/*" onchange="previewImage(event)">
+                        </div>
+                        <div>
+                            <h3 style="font-weight: 800; margin: 0;">{{ user_data.name }}</h3>
+                            <p style="color: gray; margin: 0;">Shop Owner Account</p>
+                        </div>
+                    </div>
+
+                    <h5 style="font-weight: 700; margin-bottom: 15px;">Personal Details</h5>
+                    <div class="row">
+                        <div class="col-md-6"><label>Full Name</label><input type="text" name="user_name" class="custom-input" value="{{ user_data.name }}" required></div>
+<div class="col-md-6"><label>Personal Email</label><input type="email" name="user_email" class="custom-input" value="{{ user_data.email }}" required></div>
+                        <div class="col-md-6"><label>Personal Phone</label><input type="tel" name="user_contact" id="user_contact" class="custom-input" value="{{ user_data.contact_no }}" pattern="[0-9]{10}" maxlength="10" oninput="this.value = this.value.replace(/[^0-9]/g, '');" required></div>                    </div>
+                </div>
+
+                <div class="seller-glass-card">
+                    <h5 style="font-weight: 700; margin-bottom: 15px; color: var(--gold);">Business / Shop Details</h5>
+                    <div class="row">
+                        <div class="col-md-6"><label>Shop Name</label><input type="text" name="shop_name" class="custom-input" value="{{ shop_data.shop_name }}" required></div>
+                        <div class="col-md-6"><label>Shop Email</label><input type="email" name="shop_email" class="custom-input" value="{{ shop_data.email }}" required></div>
+<div class="col-md-6"><label>Shop Contact Number</label><input type="tel" name="shop_contact" id="shop_contact" class="custom-input" value="{{ shop_data.contact_no }}" pattern="[0-9]{10}" maxlength="10" oninput="this.value = this.value.replace(/[^0-9]/g, '');" required></div>                        <div class="col-12"><label>Shop Full Address</label><input type="text" name="shop_address" class="custom-input" value="{{ shop_data.address }}" required></div>
+                    </div>
+                    <button type="submit" class="submit-btn mt-3">Update Seller Profile</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    function previewImage(event) {
+        const reader = new FileReader();
+        reader.onload = function() {
+            document.getElementById('avatar-preview').innerHTML = `<img src="${reader.result}" style="width:100%; height:100%; object-fit:cover;">`;
+        };
+        if(event.target.files[0]) reader.readAsDataURL(event.target.files[0]);
+    }
+    // Seller Form Validation
+    const sellerForm = document.getElementById('seller-form');
+    if(sellerForm) {
+        sellerForm.addEventListener('submit', function(e) {
+            const userContact = document.getElementById('user_contact').value.trim();
+            const shopContact = document.getElementById('shop_contact').value.trim();
+            const contactRegex = /^[0-9]{10}$/;
+
+            if (!contactRegex.test(userContact)) {
+                e.preventDefault(); alert("Personal Phone must be exactly 10 digits.");
+                document.getElementById('user_contact').focus(); return;
+            }
+            if (!contactRegex.test(shopContact)) {
+                e.preventDefault(); alert("Shop Contact must be exactly 10 digits.");
+                document.getElementById('shop_contact').focus(); return;
+            }
+        });
+    }
+</script>
+{% endblock %}
